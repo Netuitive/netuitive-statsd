@@ -1,8 +1,7 @@
 
 import time
-from decimal import Decimal
+import logging
 
-import json
 import netuitive
 
 
@@ -13,18 +12,44 @@ class Gauge(object):
         self.metricType = 'gauge'
         self.sparseDataStrategy = sparseDataStrategy
         self.unit = unit
-        self.values = {}
-        self.values[self.name] = {}
+        self.value = float(0)
+        self.signed = False
+        self.timestamp = int(time.time())
 
-    def add_value(self, value, ts):
-        timestamp = int(ts)
-        self.values[self.name][timestamp] = value
+    def add_value(self, value, ts, sign=None):
+        self.timestamp = int(ts)
 
-    def get_values(self):
-        return(self.values)
+        if sign is None:
+            self.value = float(value)
+
+        if sign == '+':
+            self.signed = True
+            self.value += float(value)
+
+        if sign == '-':
+            self.signed = True
+            self.value += float('-' + str(value))
+
+    def get_values(self, ts=0):
+
+        if ts > 0:
+            timestamp = int(ts)
+
+        else:
+            timestamp = self.timestamp
+
+        ret = {
+            self.name: {
+                'timestamp': timestamp,
+                'value': self.value
+            }
+        }
+
+        return(ret)
 
     def clear(self):
-        self.values.clear()
+        if self.signed is False:
+            self.value = 0
 
 
 class Counter(object):
@@ -34,44 +59,34 @@ class Counter(object):
         self.metricType = 'counter'
         self.sparseDataStrategy = sparseDataStrategy
         self.unit = unit
-        self.values = {}
-        self.values[self.name] = {}
-        self.value = Decimal(0)
+        self.value = float(0)
+        self.timestamp = int(time.time())
 
-    def add_value(self, value, ts, rate=1):
-        timestamp = int(ts)
-        self.value += Decimal(value * Decimal(1 / rate))
-        self.values[self.name][timestamp] = self.value
+    def add_value(self, value, ts, rate=None):
+        self.timestamp = int(ts)
 
-    def get_values(self):
-        return(self.values)
+        if rate is None:
+            rate = 1.0
+
+        self.value += value * float(1 / rate)
+
+    def get_values(self, ts=0):
+        if ts > 0:
+            timestamp = int(ts)
+        else:
+            timestamp = self.timestamp
+
+        ret = {
+            self.name: {
+                'timestamp': timestamp,
+                'value': self.value
+            }
+        }
+
+        return(ret)
 
     def clear(self):
-        self.value = Decimal(0)
-        self.values.clear()
-
-
-class Meter(object):
-
-    def __init__(self, name, sparseDataStrategy='None', unit=''):
-        self.name = name
-        self.metricType = 'counter'
-        self.sparseDataStrategy = sparseDataStrategy
-        self.unit = unit
-        self.values = {}
-        self.values[self.name] = {}
         self.value = 0
-
-    def add_value(self, value, ts, rate=1):
-        timestamp = int(ts)
-        self.value += Decimal(value * Decimal(1 / rate))
-        self.values[self.name][timestamp] = self.value
-
-    def get_values(self):
-        return(self.values)
-
-    def clear(self):
-        self.values.clear()
 
 
 class Histogram(object):
@@ -83,42 +98,70 @@ class Histogram(object):
         self.count = 0
         self.metricType = 'histogram'
         self.timestamp = int(time.time())
-        self.last_timestamp = int(time.time())
         self.rate = 1
         self.percentile = 0
         self.samples = []
+        self.value = float(0)
 
-    def add_value(self, value, ts, rate=1):
+    def add_value(self, value, ts, rate=None, sign=None):
         timestamp = int(ts)
-        self.count += Decimal(value * Decimal(1 / rate))
+
+        if rate is None:
+            self.value += value
+        else:
+            self.value += value * float(1 / rate)
+
         self.samples.append(value)
         self.timestamp = timestamp
-        self.last_timestamp = int(time.time())
 
-    def get_values(self):
-        ret = {}
+    def get_values(self, ts):
+
+        if ts > 0:
+            timestamp = int(ts)
+
+        else:
+            timestamp = self.timestamp
 
         samlen = len(self.samples)
 
         if samlen > 0:
             self.samples.sort()
-            sammin = self.samples[0]
-            sammax = self.samples[-1]
-            samavg = sum(self.samples) / Decimal(samlen)
-            sammed = self.samples[Decimal(round(samlen / 2 - 1))]
-            samper95 = self.samples[Decimal(round(0.95 * samlen - 1))]
-            samper99 = self.samples[Decimal(round(0.99 * samlen - 1))]
-
-            timestamp = int(time.time())
+            sammin = float(self.samples[0])
+            sammax = float(self.samples[-1])
+            samavg = float(sum(self.samples) / int(samlen))
+            sammed = float(self.samples[int(round(samlen / 2 - 1))])
+            samper95 = float(self.samples[int(round(0.95 * samlen - 1))])
+            samper99 = float(self.samples[int(round(0.99 * samlen - 1))])
 
             ret = {
-                self.name + '.count': {timestamp: samlen},
-                self.name + '.min': {timestamp: sammin},
-                self.name + '.max': {timestamp: sammax},
-                self.name + '.avg': {timestamp: samavg},
-                self.name + '.median': {timestamp: sammed},
-                self.name + '.95percentile': {timestamp: samper95},
-                self.name + '.99percentile': {timestamp: samper99}
+                self.name + '.count': {
+                    'timestamp': timestamp,
+                    'value': samlen
+                },
+                self.name + '.min': {
+                    'timestamp': timestamp,
+                    'value': sammin
+                },
+                self.name + '.max': {
+                    'timestamp': timestamp,
+                    'value': sammax
+                },
+                self.name + '.avg': {
+                    'timestamp': timestamp,
+                    'value': samavg
+                },
+                self.name + '.median': {
+                    'timestamp': timestamp,
+                    'value': sammed
+                },
+                self.name + '.95percentile': {
+                    'timestamp': timestamp,
+                    'value': samper95
+                },
+                self.name + '.99percentile': {
+                    'timestamp': timestamp,
+                    'value': samper99
+                }
             }
 
         return(ret)
@@ -126,6 +169,7 @@ class Histogram(object):
     def clear(self):
         self.samples = []
         self.count = 0
+        self.value = float(0)
 
 
 class Set(object):
@@ -137,18 +181,27 @@ class Set(object):
         self.value = set()
         self.timestamp = int(time.time())
         self.metricType = 'set'
-        self.values = {}
-        self.values[self.name] = {}
 
-    def add_value(self, value, ts):
+    def add_value(self, value, ts, sign=None):
         timestamp = int(ts)
         self.value.add(value)
         self.timestamp = timestamp
 
-    def get_values(self):
-        timestamp = int(time.time())
-        self.values[self.name][timestamp] = len(self.value)
-        return(self.values)
+    def get_values(self, ts=0):
+        if ts > 0:
+            timestamp = int(ts)
+
+        else:
+            timestamp = self.timestamp
+
+        ret = {
+            self.name: {
+                'timestamp': timestamp,
+                'value': float(len(self.value))
+            }
+        }
+
+        return(ret)
 
     def clear(self):
         self.value.clear()
@@ -169,8 +222,7 @@ class Element(object):
                              'g': 'GAUGE',
                              'ms': 'TIMER',
                              's': 'SET',
-                             'h': 'HISTOGRAM',
-                             'm': 'METER'}
+                             'h': 'HISTOGRAM'}
 
     def add_attribute(self, name, value):
         self.element.add_attribute(name, value)
@@ -182,7 +234,7 @@ class Element(object):
         self.metrics.clear()
         self.element.clear_samples()
 
-    def add_sample(self, metricId, ts, value, metricType, rate=1, sparseDataStrategy='None', unit=''):
+    def add_sample(self, metricId, ts, value, metricType, sign=None, rate=None, sparseDataStrategy='None', unit=''):
 
         try:
             timestamp = int(ts)
@@ -193,7 +245,7 @@ class Element(object):
                     self.metrics[metricId] = Gauge(
                         metricId, sparseDataStrategy, unit)
 
-                self.metrics[metricId].add_value(Decimal(value), timestamp)
+                self.metrics[metricId].add_value(value, timestamp, sign)
 
             if mtype == 'COUNTER':
                 if metricId not in self.metrics:
@@ -201,15 +253,7 @@ class Element(object):
                         metricId, sparseDataStrategy, unit)
 
                 self.metrics[metricId].add_value(
-                    Decimal(value), timestamp, rate)
-
-            if mtype == 'METER':
-                if metricId not in self.metrics:
-                    self.metrics[metricId] = Meter(
-                        metricId, sparseDataStrategy, unit)
-
-                self.metrics[metricId].add_value(
-                    Decimal(value), timestamp, rate)
+                    value, timestamp, rate)
 
             if mtype == 'HISTOGRAM' or mtype == 'TIMER':
                 if metricId not in self.metrics:
@@ -217,14 +261,14 @@ class Element(object):
                         metricId, sparseDataStrategy, unit)
 
                 self.metrics[metricId].add_value(
-                    Decimal(value), timestamp, rate)
+                    value, timestamp, rate)
 
             if mtype == 'SET':
                 if metricId not in self.metrics:
                     self.metrics[metricId] = Set(
                         metricId, sparseDataStrategy, unit)
 
-                self.metrics[metricId].add_value(Decimal(value), timestamp)
+                self.metrics[metricId].add_value(value, timestamp)
 
         except Exception as e:
             raise(e)
@@ -233,23 +277,23 @@ class Element(object):
 
         try:
             for m in self.metrics:
-                metrics = self.metrics[m].get_values()
+                metrics = self.metrics[m].get_values(int(time.time()))
                 metricType = self.metrics[m].metricType
                 sparseDataStrategy = self.metrics[m].sparseDataStrategy
                 unit = self.metrics[m].unit
 
                 for name in metrics:
-                    for timestamp in metrics[name]:
-                        value = metrics[name][timestamp]
+                    timestamp = metrics[name]['timestamp']
+                    value = float(metrics[name]['value'])
 
-                        self.element.add_sample(
-                            name,
-                            timestamp,
-                            value,
-                            metricType,
-                            self.elementId,
-                            sparseDataStrategy,
-                            unit)
+                    self.element.add_sample(
+                        name,
+                        timestamp,
+                        value,
+                        metricType,
+                        self.elementId,
+                        sparseDataStrategy,
+                        unit)
 
                 metrics = self.metrics[m].clear()
 

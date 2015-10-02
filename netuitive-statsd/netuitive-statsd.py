@@ -39,7 +39,7 @@ import platform
 import datetime
 import re
 import traceback
-from decimal import Decimal
+
 
 import configobj
 import psutil
@@ -58,10 +58,10 @@ __version__ = "0.0.1"
 __author__ = "Netuitive, Inc."
 __license__ = "Apache 2.0"
 
-LOG = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 REGEX = re.compile(
-    r'((?P<metric_name>[a-zA-Z0-9\.]+):(?P<metric_value>[\d\-\+]+)\|(?P<metric_type>[\w]+)(\|@(?P<metric_rate>[\d\.]+))?(\|#(?P<metric_tags>[\w:,]+))?(\\n)?)?(^_e{(?P<event_title_length>[\d]+),(?P<event_text_length>[\d]+)}:(?P<event_title>[^|]+)\|(?P<event_text>[^|\n]+)?(\|d:(?P<event_date_happened>[^|\n]+))?(\|h:(?P<event_hostname>[^|\n]+))?(\|k:(?P<event_aggregationkey>[^|\n]+))?(\|p:(?P<event_priority>[^|\n]+))?(\|s:(?P<event_source_type_name>[^|\n]+))?(\|t:(?P<event_alert_type>[^|\n]+))?(\|#(?P<event_tags>[\w\d,:]+))?$)?')
+    r'((?P<metric_name>[a-zA-Z0-9\.]+):(?P<metric_sign>[-\+])?(?P<metric_value>[\d\-\+]+)\|(?P<metric_type>[\w]+)(\|@(?P<metric_rate>[\d\.]+))?(\|#(?P<metric_tags>[\w:,]+))?(\\n)?)?(^_e{(?P<event_title_length>[\d]+),(?P<event_text_length>[\d]+)}:(?P<event_title>[^|]+)\|(?P<event_text>[^|\n]+)?(\|d:(?P<event_date_happened>[^|\n]+))?(\|h:(?P<event_hostname>[^|\n]+))?(\|k:(?P<event_aggregationkey>[^|\n]+))?(\|p:(?P<event_priority>[^|\n]+))?(\|s:(?P<event_source_type_name>[^|\n]+))?(\|t:(?P<event_alert_type>[^|\n]+))?(\|#(?P<event_tags>[\w\d,:]+))?$)?')
 
 
 # default config
@@ -90,7 +90,7 @@ def get_human_readable_size(num):
     i = 0
     while i + 1 < len(exp_str) and num >= (2 ** exp_str[i + 1][0]):
         i += 1
-        rounded_val = round(Decimal(num) / 2 ** exp_str[i][0], 2)
+        rounded_val = round(int(num) / 2 ** exp_str[i][0], 2)
     return '%s %s' % (int(rounded_val), exp_str[i][1])
 
 
@@ -161,7 +161,7 @@ def get_sys_meta():
 
         ret.append({'netuitive-statsd': __version__})
 
-        LOG.info('Added system metadata')
+        log.info('Added system metadata')
 
     except Exception as e:
         log_exception(e)
@@ -188,7 +188,7 @@ def get_docker_meta():
                         v = vl
                     ret.append({'docker_' + k: v})
 
-            LOG.info('Added docker metadata')
+            log.info('Added docker metadata')
 
         except Exception as e:
             log_exception(e)
@@ -213,7 +213,7 @@ def get_aws_meta():
                 vl = ', '.join(v)
                 v = vl
             ret.append({k: v})
-        LOG.info('Added AWS metadata')
+        log.info('Added AWS metadata')
 
     except Exception as e:
         if CONFIG['debug'] is True:
@@ -228,7 +228,7 @@ def add_metadata(element, tags):
     """
     try:
 
-        LOG.info('Gathering metadata')
+        log.info('Gathering metadata')
 
         for a in get_sys_meta():
             for k in a:
@@ -267,7 +267,7 @@ def extract_function_name():
 
 
 def log_exception(e):
-    LOG.error(
+    log.error(
         "Function {function_name} raised {exception_class} ({exception_docstring}): {exception_message} at {linenumber}".format(
             function_name=extract_function_name(),  # this is optional
             exception_class=e.__class__,
@@ -292,11 +292,11 @@ def log_setup(config, level='WARN', stdout=False):
 
     try:
         if stdout:
-            LOG.setLevel(logging.DEBUG)
+            log.setLevel(logging.DEBUG)
             streamHandler = logging.StreamHandler(sys.stdout)
             streamHandler.setFormatter(formatter)
             streamHandler.setLevel(logging.DEBUG)
-            LOG.addHandler(streamHandler)
+            log.addHandler(streamHandler)
 
         else:
             logging.basicConfig(
@@ -322,15 +322,19 @@ def regex_parse_message(message):
             if msg.group(0):
                 sample_count += 1
                 if msg.group('metric_name'):
-                    rate = ''
+                    rate = None
+                    sign = None
                     tags = []
 
                     metric = msg.group('metric_name')
-                    value = msg.group('metric_value')
+                    value = float(msg.group('metric_value'))
                     mtype = msg.group('metric_type')
 
                     if msg.group('metric_rate'):
-                        rate = msg.group('metric_rate')
+                        rate = float(msg.group('metric_rate'))
+
+                    if msg.group('metric_sign'):
+                        sign = msg.group('metric_sign')
 
                     if msg.group('metric_tags'):
                         tgs = msg.group('metric_tags')
@@ -342,13 +346,14 @@ def regex_parse_message(message):
                             else:
                                 tags.append({t[0]: None})
 
-                    LOG.debug(
-                        'Message (metric): ' + str((metric, value, mtype, rate, tags)))
+                    log.debug(
+                        'Message (metric): ' + str((metric, value, mtype, sign, rate, tags)))
 
                     ret['metrics'].append({
                         'metric': metric,
                         'value': value,
                         'type': mtype,
+                        'sign': sign,
                         'rate': rate,
                         'tags': tags})
 
@@ -394,7 +399,7 @@ def regex_parse_message(message):
                             else:
                                 tags.append({t[0]: None})
 
-                    LOG.debug(
+                    log.debug(
                         'Message (event): ' + str((title, text, date_happened, hostname, aggregation_key, priority, source_type_name, alert_type, tags)))
 
                     ret['events'].append({
@@ -409,7 +414,7 @@ def regex_parse_message(message):
                         'tags': tags})
 
         if sample_count == 0:
-            LOG.error(
+            log.error(
                 'Invalid Message Format: "' + str(message) + '"')
             return(None)
 
@@ -421,137 +426,137 @@ def regex_parse_message(message):
         log_exception(e)
 
 
-def parse_message(message):
-    """
-    parse a statsd message via string splitting and return the results
-    """
-    ret = {}
-    ret['metrics'] = []
-    ret['events'] = []
+# def parse_message(message):
+#     """
+#     parse a statsd message via string splitting and return the results
+#     """
+#     ret = {}
+#     ret['metrics'] = []
+#     ret['events'] = []
 
-    sample_count = 0
-    event_count = 0
+#     sample_count = 0
+#     event_count = 0
 
-    try:
-        for msg in message.splitlines():
+#     try:
+#         for msg in message.splitlines():
 
-            parts = msg.split('|')
-            if parts[0].startswith('_e'):
-                sample_count += 1
-                date_happened = ''
-                hostname = ''
-                aggregationkey = ''
-                priority = ''
-                source_type_name = ''
-                alert_type = ''
-                tags = []
-                event_count += 1
+#             parts = msg.split('|')
+#             if parts[0].startswith('_e'):
+#                 sample_count += 1
+#                 date_happened = ''
+#                 hostname = ''
+#                 aggregationkey = ''
+#                 priority = ''
+#                 source_type_name = ''
+#                 alert_type = ''
+#                 tags = []
+#                 event_count += 1
 
-                title = parts[0].split(':')[1]
-                text = parts[1]
+#                 title = parts[0].split(':')[1]
+#                 text = parts[1]
 
-                if len(parts) > 2:
-                    for p in parts[2:]:
-                        if p.startswith('#'):
-                            tgs = p.replace('#', '')
-                            for ts in tgs.split(','):
-                                t = ts.split(':')
-                                if len(t) == 2:
-                                    tags.append({t[0]: t[1]})
-                                else:
-                                    tags.append({t[0]: None})
+#                 if len(parts) > 2:
+#                     for p in parts[2:]:
+# if p.startswith('#'):
+# tgs = p.replace('#', '')
+#                             for ts in tgs.split(','):
+#                                 t = ts.split(':')
+#                                 if len(t) == 2:
+#                                     tags.append({t[0]: t[1]})
+#                                 else:
+#                                     tags.append({t[0]: None})
 
-                        else:
-                            m = p.split(':')
+#                         else:
+#                             m = p.split(':')
 
-                            if m[0] == 'd':
-                                date_happened = m[1]
+#                             if m[0] == 'd':
+#                                 date_happened = m[1]
 
-                            elif m[0] == 'h':
-                                hostname = m[1]
+#                             elif m[0] == 'h':
+#                                 hostname = m[1]
 
-                            elif m[0] == 'k':
-                                aggregation_key = m[1]
+#                             elif m[0] == 'k':
+#                                 aggregation_key = m[1]
 
-                            elif m[0] == 'p':
-                                priority = m[1]
+#                             elif m[0] == 'p':
+#                                 priority = m[1]
 
-                            elif m[0] == 's':
-                                source_type_name = m[1]
+#                             elif m[0] == 's':
+#                                 source_type_name = m[1]
 
-                            elif m[0] == 't':
-                                alert_type = m[1]
+#                             elif m[0] == 't':
+#                                 alert_type = m[1]
 
-                LOG.debug(
-                    'Message (event): ' + str((title, text, date_happened, hostname, aggregation_key, priority, source_type_name, alert_type, tags)))
+#                 log.debug(
+#                     'Message (event): ' + str((title, text, date_happened, hostname, aggregation_key, priority, source_type_name, alert_type, tags)))
 
-                ret['events'].append({
-                    'title': title,
-                    'text': text,
-                    'date_happened': date_happened,
-                    'hostname': hostname,
-                    'aggregation_key': aggregationkey,
-                    'priority': priority,
-                    'source_type_name': source_type_name,
-                    'alert_type': alert_type,
-                    'tags': tags})
+#                 ret['events'].append({
+#                     'title': title,
+#                     'text': text,
+#                     'date_happened': date_happened,
+#                     'hostname': hostname,
+#                     'aggregation_key': aggregationkey,
+#                     'priority': priority,
+#                     'source_type_name': source_type_name,
+#                     'alert_type': alert_type,
+#                     'tags': tags})
 
-            elif len(parts[0].split(':')) > 1:
-                sample_count += 1
-                rate = ''
-                tags = []
-                metric = parts[0].split(':')[0]
-                value = parts[0].split(':')[1]
-                mtype = parts[1]
+#             elif len(parts[0].split(':')) > 1:
+#                 sample_count += 1
+#                 rate = ''
+#                 tags = []
+#                 metric = parts[0].split(':')[0]
+#                 value = parts[0].split(':')[1]
+#                 mtype = parts[1]
 
-                if len(parts) > 2:
-                    if parts[2].startswith('@'):
-                        rate = parts[2].replace('@', '')
+#                 if len(parts) > 2:
+#                     if parts[2].startswith('@'):
+#                         rate = parts[2].replace('@', '')
 
-                    if parts[2].startswith('#'):
-                        tgs = parts[2].replace('#', '')
+# if parts[2].startswith('#'):
+# tgs = parts[2].replace('#', '')
 
-                        for ts in tgs.split(','):
-                            t = ts.split(':')
-                            if len(t) == 2:
-                                tags.append({t[0]: t[1]})
-                            else:
-                                tags.append({t[0]: None})
+#                         for ts in tgs.split(','):
+#                             t = ts.split(':')
+#                             if len(t) == 2:
+#                                 tags.append({t[0]: t[1]})
+#                             else:
+#                                 tags.append({t[0]: None})
 
-                if len(parts) > 3:
+#                 if len(parts) > 3:
 
-                    if parts[3].startswith('#'):
-                        tgs = parts[3].replace('#', '')
+# if parts[3].startswith('#'):
+# tgs = parts[3].replace('#', '')
 
-                        for ts in tgs.split(','):
-                            t = ts.split(':')
-                            if len(t) == 2:
-                                tags.append({t[0]: t[1]})
-                            else:
-                                tags.append({t[0]: None})
+#                         for ts in tgs.split(','):
+#                             t = ts.split(':')
+#                             if len(t) == 2:
+#                                 tags.append({t[0]: t[1]})
+#                             else:
+#                                 tags.append({t[0]: None})
 
-                LOG.debug(
-                    'Message (metric): ' + str((metric, value, mtype, rate, tags)))
+#                 log.debug(
+#                     'Message (metric): ' + str((metric, value, mtype, rate, tags)))
 
-                ret['metrics'].append({
-                    'metric': metric,
-                    'value': value,
-                    'type': mtype,
-                    'rate': rate,
-                    'tags': tags})
+#                 ret['metrics'].append({
+#                     'metric': metric,
+#                     'value': value,
+#                     'type': mtype,
+#                     'rate': rate,
+#                     'tags': tags})
 
-        if sample_count == 0:
-            ret = {}
-            LOG.error(
-                'Invalid Message Format: "' + str(message) + '"')
-            return(None)
+#         if sample_count == 0:
+#             ret = {}
+#             log.error(
+#                 'Invalid Message Format: "' + str(message) + '"')
+#             return(None)
 
-        ret['counts'] = {'messages': sample_count, 'events': event_count}
+#         ret['counts'] = {'messages': sample_count, 'events': event_count}
 
-        return(ret)
+#         return(ret)
 
-    except Exception as e:
-        log_exception(e)
+#     except Exception as e:
+#         log_exception(e)
 
 
 class Elements(object):
@@ -562,17 +567,14 @@ class Elements(object):
         self.elements = {}
         self.elements[self.hostname] = self.element
 
-    def add(self, metricId, ts, val, metricType, rate=1, tags=[], elementId=None):
-        LOG.debug('Element.add for metricId: {0}, ts: {1}, val: {2}, metricType:{3}, rate: {4}, tags: {5}, elementId: {6}'.format(
-            str(metricId), str(ts), str(val), str(metricType), str(rate),
-            str(tags), str(elementId)))
+    def add(self, metricId, ts, val, metricType, sign=None, rate=None, tags=[], elementId=None):
+        # log.debug('Element.add for metricId: {0}, ts: {1}, val: {2}, metricType:{3}, sign: {4}, rate: {5}, tags: {6}, elementId: {7}'.format(
+        # str(metricId), str(ts), str(val), str(metricType), str(sign),
+        # str(rate), str(tags), str(elementId)))
 
         try:
             timestamp = int(ts)
-            value = Decimal(val)
-
-            if rate == "":
-                rate = 1
+            value = val
 
             for t in tags:
                 if 'host' in t:
@@ -585,7 +587,7 @@ class Elements(object):
                 self.elements[elementId] = Element(elementId)
 
             self.elements[elementId].add_sample(
-                metricId, timestamp, value, metricType, rate)
+                metricId, timestamp, value, metricType, sign, rate)
 
         except Exception as e:
             log_exception(e)
@@ -594,7 +596,7 @@ class Elements(object):
         del self.elements[elementId]
 
     def clear_samples(self, elementId=None, everything=False):
-        LOG.debug('Element.clear_samples for ' + str(elementId))
+        log.debug('Element.clear_samples for ' + str(elementId))
         try:
             if elementId is None and everything is True:
                 for ename in self.elements:
@@ -616,17 +618,17 @@ class Poster(threading.Thread):
     """
 
     def __init__(self, config, element):
-        LOG.debug('Poster')
+        log.debug('Poster')
         threading.Thread.__init__(self)
         self.setName('PosterThread')
         self.config = config
         self.runner = threading.Event()
-        self.sample_count = Decimal(0)
-        self.packet_count = Decimal(0)
-        self.event_count = Decimal(0)
+        self.sample_count = float(0)
+        self.packet_count = float(0)
+        self.event_count = float(0)
         self.stats_prefix = 'netuitive-statsd'
 
-        LOG.info('Messages will be sent to ' + self.config['url'])
+        log.info('Messages will be sent to ' + self.config['url'])
 
         self.api = netuitive.Client(self.config['url'], self.config['api_key'])
         self.interval = self.config['interval']
@@ -634,27 +636,15 @@ class Poster(threading.Thread):
         self.elements = Elements(self.hostname, element)
 
     def stop(self):
-        LOG.info("Shutting down")
+        log.info("Shutting down")
         self.runner.set()
 
     def run(self):
         while not self.runner.is_set():
-            LOG.debug('Waiting {0} seconds'.format(self.interval))
+            log.debug('Waiting {0} seconds'.format(self.interval))
             self.runner.wait(self.interval)
-            LOG.debug('Flushing')
+            log.debug('Flushing')
             self.flush()
-
-    # def get_rate(self, count, interval):
-
-    #     if interval == 0:
-    #         return(Decimal(0))
-
-    #     else:
-    #         rate = Decimal(count / interval)
-    #         LOG.debug(
-    #             'count: {0}, interval: {1}, rate: {2}'.format(count, interval, rate))
-
-    #         return(rate)
 
     def flush(self):
         try:
@@ -664,45 +654,27 @@ class Poster(threading.Thread):
             self.elements.add(self.stats_prefix + '.packets_received.count',
                               timestamp,
                               self.packet_count,
-                              'g',
-                              self.interval)
+                              'c')
 
             self.elements.add(self.stats_prefix + '.samples_received.count',
                               timestamp,
                               self.sample_count,
-                              'g',
-                              self.interval)
+                              'c')
 
             self.elements.add(self.stats_prefix + '.event_received.count',
                               timestamp,
                               self.event_count,
-                              'g',
-                              self.interval)
+                              'c')
 
-            self.elements.add(self.stats_prefix + '.packets_received.rate.' + str(self.interval),
-                              timestamp,
-                              self.packet_count,
-                              'c',
-                              self.interval)
-
-            self.elements.add(self.stats_prefix + '.samples_received.rate.' + str(self.interval),
-                              timestamp,
-                              self.sample_count,
-                              'c',
-                              self.interval)
-
-            self.elements.add(self.stats_prefix + '.event_received.rate.' + str(self.interval),
-                              timestamp,
-                              self.event_count,
-                              'c',
-                              self.interval)
-
-            LOG.debug('Sample count: {0}'.format(self.sample_count))
-            LOG.debug('Packet count: {0}'.format(self.packet_count))
-            LOG.debug('Event count: {0}'.format(self.event_count))
+            log.debug('Sample count: {0}'.format(self.sample_count))
+            log.debug('Packet count: {0}'.format(self.packet_count))
+            log.debug('Event count: {0}'.format(self.event_count))
 
             ec = 0
             sc = 0
+
+            log.debug(
+                'Flushing {0} elements with {1} samples total'.format(ec, sc))
 
             for ename in self.elements.elements:
                 e = self.elements.elements[ename]
@@ -711,26 +683,25 @@ class Poster(threading.Thread):
                 ec += 1
                 sc += len(element.samples)
 
-                LOG.debug(
+                log.debug(
                     '{0} has {1} samples'.format(ename, len(element.samples)))
                 for s in element.samples:
-                    LOG.debug('elementId: {0} metricId: {1} value: {2} timestamp: {3}'.format(
+                    log.debug('elementId: {0} metricId: {1} value: {2} timestamp: {3}'.format(
                         ename, s.metricId, s.val, str(s.timestamp)))
 
-            LOG.debug(
-                'Flushing {0} elements with {1} samples total'.format(ec, sc))
+                if sc > 0:
+                    log.debug(
+                        'sending {0} samples for for {1}'.format(sc, ename))
+                    self.api.post(element)
+                    self.elements.clear_samples(ename)
 
-            # send the data to Netuitive
-            # self.api.post(self.element)
-            self.elements.clear_samples(everything=True)
-
-            LOG.info(
+            log.info(
                 'Successfully sent {0} elements with {1} samples total'.format(ec, sc))
 
             # reset
-            self.sample_count = Decimal(0)
-            self.packet_count = Decimal(0)
-            self.event_count = Decimal(0)
+            self.sample_count = float(0)
+            self.packet_count = float(0)
+            self.event_count = float(0)
 
         except Exception as e:
             log_exception(e)
@@ -745,8 +716,8 @@ class Poster(threading.Thread):
             messages = regex_parse_message(message)
 
             if messages is not None:
-                self.sample_count += Decimal(messages['counts']['messages'])
-                self.event_count += Decimal(messages['counts']['events'])
+                self.sample_count += float(messages['counts']['messages'])
+                self.event_count += float(messages['counts']['events'])
 
                 if len(messages['metrics']) > 0:
                     for m in messages['metrics']:
@@ -755,17 +726,10 @@ class Poster(threading.Thread):
                             timestamp,
                             m['value'],
                             m['type'],
+                            m['sign'],
                             m['rate'],
                             m['tags']
                         )
-
-                # self.elements.add(
-                #     self.stats_prefix + '.event_received.rate.' +
-                #     str(self.interval),
-                #     timestamp,
-                #     self.event_count,
-                #     'c',
-                #     self.interval)
 
         except Exception as e:
             log_exception(e)
@@ -793,7 +757,7 @@ class Server(object):
             self.forward_ip = self.config['forward_ip']
             self.forward_port = int(self.config['forward_port'])
 
-            LOG.info("All packets received will be forwarded to {0}:{1}".format(
+            log.info("All packets received will be forwarded to {0}:{1}".format(
                 self.forward_ip, self.forward_port))
             try:
                 self.forward_sock = socket.socket(
@@ -801,7 +765,7 @@ class Server(object):
                 self.forward_sock.connect(
                     (self.forward_ip, self.forward_port))
             except Exception as e:
-                LOG.exception(
+                log.exception(
                     "Error while setting up connection to external statsd server: {0}".format(str(e)))
                 log_exception(e)
 
@@ -815,7 +779,7 @@ class Server(object):
                 self.address = ('127.0.0.1', self.address[1])
                 self.socket.bind(self.address)
 
-        LOG.info('Listening on {0}:{1}'.format(
+        log.info('Listening on {0}:{1}'.format(
             self.address[0], self.address[1]))
 
         # Run loop
@@ -829,11 +793,11 @@ class Server(object):
                     # get the packet
                     packet = self.socket.recv(self.buffer_size)
                     timestamp = time.time()
-                    LOG.debug('Received packer: ' + packet)
+                    log.debug('Received packer: ' + packet.rstrip('\n'))
                     self.poster.submit(packet, timestamp)
 
                     if self.forward is True:
-                        LOG.debug('Forwarded packet: ' + packet)
+                        log.debug('Forwarded packet: ' + packet)
                         self.forward_sock.send(packet)
 
             except select.error as e:
@@ -849,7 +813,7 @@ class Server(object):
                 log_exception(e)
 
     def stop(self):
-        LOG.info("Shutting down")
+        log.info("Shutting down")
         self.is_running = False
 
 
@@ -867,7 +831,7 @@ class Service(Daemon):
         self.poster = poster
 
     def _handle_sigterm(self, signum, frame):
-        LOG.debug('Sigterm. Stopping.')
+        log.debug('Sigterm. Stopping.')
         self.server.stop()
         self.poster.stop()
 
@@ -881,16 +845,16 @@ class Service(Daemon):
                 self.server.start()
 
             except Exception as e:
-                LOG.exception('Error starting server')
+                log.exception('Error starting server')
                 raise e
         finally:
             self.poster.stop()
             self.poster.join()
-            LOG.info("Stopped")
+            log.info("Stopped")
 
     @classmethod
     def info(self):
-        LOG.setLevel(logging.ERROR)
+        log.setLevel(logging.ERROR)
 
 
 if __name__ == "__main__":
@@ -956,7 +920,7 @@ if __name__ == "__main__":
 
         # setup logging
         log_setup(CONFIG, loglvl, stdout=CONFIG['debug'])
-        LOG.info('Loaded config from ' + configfile)
+        log.info('Loaded config from ' + configfile)
 
         # create and element and add metadata
         myElement = Element(CONFIG['hostname'])
@@ -987,7 +951,7 @@ if __name__ == "__main__":
 
         else:
             # do my job loudly!
-            LOG.debug('debug logging is on')
+            log.debug('debug logging is on')
             poster.start()
             server.start()
 
