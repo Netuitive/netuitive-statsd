@@ -50,15 +50,13 @@ from setproctitle import setproctitle
 import netuitive
 from elements import Element
 
-# from .metric import Metric
-# from .element import Element
-
 # Constants
 __version__ = "0.0.1"
 __author__ = "Netuitive, Inc."
 __license__ = "Apache 2.0"
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger()
+
 
 REGEX = re.compile(
     r'((?P<metric_name>[a-zA-Z0-9\.]+):(?P<metric_sign>[-\+])?(?P<metric_value>[\d\-\+]+)\|(?P<metric_type>[\w]+)(\|@(?P<metric_rate>[\d\.]+))?(\|#(?P<metric_tags>[\w:,]+))?(\\n)?)?(^_e{(?P<event_title_length>[\d]+),(?P<event_text_length>[\d]+)}:(?P<event_title>[^|]+)\|(?P<event_text>[^|\n]+)?(\|d:(?P<event_date_happened>[^|\n]+))?(\|h:(?P<event_hostname>[^|\n]+))?(\|k:(?P<event_aggregationkey>[^|\n]+))?(\|p:(?P<event_priority>[^|\n]+))?(\|s:(?P<event_source_type_name>[^|\n]+))?(\|t:(?P<event_alert_type>[^|\n]+))?(\|#(?P<event_tags>[\w\d,:]+))?$)?')
@@ -161,7 +159,7 @@ def get_sys_meta():
 
         ret.append({'netuitive-statsd': __version__})
 
-        log.info('Added system metadata')
+        logger.info('Added system metadata')
 
     except Exception as e:
         log_exception(e)
@@ -188,10 +186,10 @@ def get_docker_meta():
                         v = vl
                     ret.append({'docker_' + k: v})
 
-            log.info('Added docker metadata')
+            logger.info('Added docker metadata')
 
-        except Exception as e:
-            log_exception(e)
+        except Exception:
+            pass
 
     return(ret)
 
@@ -213,7 +211,7 @@ def get_aws_meta():
                 vl = ', '.join(v)
                 v = vl
             ret.append({k: v})
-        log.info('Added AWS metadata')
+        logger.info('Added AWS metadata')
 
     except Exception as e:
         if CONFIG['debug'] is True:
@@ -228,7 +226,7 @@ def add_metadata(element, tags):
     """
     try:
 
-        log.info('Gathering metadata')
+        logger.info('Gathering metadata')
 
         for a in get_sys_meta():
             for k in a:
@@ -267,7 +265,7 @@ def extract_function_name():
 
 
 def log_exception(e):
-    log.error(
+    logger.error(
         "Function {function_name} raised {exception_class} ({exception_docstring}): {exception_message} at {linenumber}".format(
             function_name=extract_function_name(),  # this is optional
             exception_class=e.__class__,
@@ -287,16 +285,21 @@ def log_setup(config, level='WARN', stdout=False):
 
     lvl = lvls[level]
 
-    logformat = '[%(asctime)s] [%(threadName)s] %(message)s'
+    if level == 'DEBUG' or stdout:
+        logformat = '[%(asctime)s] [%(threadName)s] [%(levelname)s] [%(module)s] [%(lineno)d] [%(name)s] : %(message)s'
+
+    else:
+        logformat = '[%(asctime)s] [%(levelname)s] : %(message)s'
+
     formatter = logging.Formatter(logformat)
 
     try:
         if stdout:
-            log.setLevel(logging.DEBUG)
+            logger.setLevel(logging.DEBUG)
             streamHandler = logging.StreamHandler(sys.stdout)
             streamHandler.setFormatter(formatter)
             streamHandler.setLevel(logging.DEBUG)
-            log.addHandler(streamHandler)
+            logger.addHandler(streamHandler)
 
         else:
             logging.basicConfig(
@@ -346,7 +349,7 @@ def regex_parse_message(message):
                             else:
                                 tags.append({t[0]: None})
 
-                    log.debug(
+                    logger.debug(
                         'Message (metric): ' + str((metric, value, mtype, sign, rate, tags)))
 
                     ret['metrics'].append({
@@ -399,7 +402,7 @@ def regex_parse_message(message):
                             else:
                                 tags.append({t[0]: None})
 
-                    log.debug(
+                    logger.debug(
                         'Message (event): ' + str((title, text, date_happened, hostname, aggregation_key, priority, source_type_name, alert_type, tags)))
 
                     ret['events'].append({
@@ -414,7 +417,7 @@ def regex_parse_message(message):
                         'tags': tags})
 
         if sample_count == 0:
-            log.error(
+            logger.error(
                 'Invalid Message Format: "' + str(message) + '"')
             return(None)
 
@@ -487,7 +490,7 @@ def regex_parse_message(message):
 #                             elif m[0] == 't':
 #                                 alert_type = m[1]
 
-#                 log.debug(
+#                 logger.debug(
 #                     'Message (event): ' + str((title, text, date_happened, hostname, aggregation_key, priority, source_type_name, alert_type, tags)))
 
 #                 ret['events'].append({
@@ -535,7 +538,7 @@ def regex_parse_message(message):
 #                             else:
 #                                 tags.append({t[0]: None})
 
-#                 log.debug(
+#                 logger.debug(
 #                     'Message (metric): ' + str((metric, value, mtype, rate, tags)))
 
 #                 ret['metrics'].append({
@@ -547,7 +550,7 @@ def regex_parse_message(message):
 
 #         if sample_count == 0:
 #             ret = {}
-#             log.error(
+#             logger.error(
 #                 'Invalid Message Format: "' + str(message) + '"')
 #             return(None)
 
@@ -568,7 +571,7 @@ class Elements(object):
         self.elements[self.hostname] = self.element
 
     def add(self, metricId, ts, val, metricType, sign=None, rate=None, tags=[], elementId=None):
-        # log.debug('Element.add for metricId: {0}, ts: {1}, val: {2}, metricType:{3}, sign: {4}, rate: {5}, tags: {6}, elementId: {7}'.format(
+        # logger.debug('Element.add for metricId: {0}, ts: {1}, val: {2}, metricType:{3}, sign: {4}, rate: {5}, tags: {6}, elementId: {7}'.format(
         # str(metricId), str(ts), str(val), str(metricType), str(sign),
         # str(rate), str(tags), str(elementId)))
 
@@ -596,7 +599,7 @@ class Elements(object):
         del self.elements[elementId]
 
     def clear_samples(self, elementId=None, everything=False):
-        log.debug('Element.clear_samples for ' + str(elementId))
+        logger.debug('Element.clear_samples for ' + str(elementId))
         try:
             if elementId is None and everything is True:
                 for ename in self.elements:
@@ -618,7 +621,7 @@ class Poster(threading.Thread):
     """
 
     def __init__(self, config, element):
-        log.debug('Poster')
+        logger.debug('Poster')
         threading.Thread.__init__(self)
         self.setName('PosterThread')
         self.config = config
@@ -628,7 +631,7 @@ class Poster(threading.Thread):
         self.event_count = float(0)
         self.stats_prefix = 'netuitive-statsd'
 
-        log.info('Messages will be sent to ' + self.config['url'])
+        logger.info('Messages will be sent to ' + self.config['url'])
 
         self.api = netuitive.Client(self.config['url'], self.config['api_key'])
         self.interval = self.config['interval']
@@ -636,14 +639,14 @@ class Poster(threading.Thread):
         self.elements = Elements(self.hostname, element)
 
     def stop(self):
-        log.info("Shutting down")
+        logger.info("Shutting down")
         self.runner.set()
 
     def run(self):
         while not self.runner.is_set():
-            log.debug('Waiting {0} seconds'.format(self.interval))
+            logger.debug('Waiting {0} seconds'.format(self.interval))
             self.runner.wait(self.interval)
-            log.debug('Flushing')
+            logger.debug('Flushing')
             self.flush()
 
     def flush(self):
@@ -666,14 +669,14 @@ class Poster(threading.Thread):
                               self.event_count,
                               'c')
 
-            log.debug('Sample count: {0}'.format(self.sample_count))
-            log.debug('Packet count: {0}'.format(self.packet_count))
-            log.debug('Event count: {0}'.format(self.event_count))
+            logger.debug('Sample count: {0}'.format(self.sample_count))
+            logger.debug('Packet count: {0}'.format(self.packet_count))
+            logger.debug('Event count: {0}'.format(self.event_count))
 
             ec = 0
             sc = 0
 
-            log.debug(
+            logger.debug(
                 'Flushing {0} elements with {1} samples total'.format(ec, sc))
 
             for ename in self.elements.elements:
@@ -683,19 +686,19 @@ class Poster(threading.Thread):
                 ec += 1
                 sc += len(element.samples)
 
-                log.debug(
+                logger.debug(
                     '{0} has {1} samples'.format(ename, len(element.samples)))
                 for s in element.samples:
-                    log.debug('elementId: {0} metricId: {1} value: {2} timestamp: {3}'.format(
+                    logger.debug('elementId: {0} metricId: {1} value: {2} timestamp: {3}'.format(
                         ename, s.metricId, s.val, str(s.timestamp)))
 
                 if sc > 0:
-                    log.debug(
+                    logger.debug(
                         'sending {0} samples for for {1}'.format(sc, ename))
                     self.api.post(element)
                     self.elements.clear_samples(ename)
 
-            log.info(
+            logger.info(
                 'Successfully sent {0} elements with {1} samples total'.format(ec, sc))
 
             # reset
@@ -757,7 +760,7 @@ class Server(object):
             self.forward_ip = self.config['forward_ip']
             self.forward_port = int(self.config['forward_port'])
 
-            log.info("All packets received will be forwarded to {0}:{1}".format(
+            logger.info("All packets received will be forwarded to {0}:{1}".format(
                 self.forward_ip, self.forward_port))
             try:
                 self.forward_sock = socket.socket(
@@ -765,7 +768,7 @@ class Server(object):
                 self.forward_sock.connect(
                     (self.forward_ip, self.forward_port))
             except Exception as e:
-                log.exception(
+                logger.exception(
                     "Error while setting up connection to external statsd server: {0}".format(str(e)))
                 log_exception(e)
 
@@ -779,7 +782,7 @@ class Server(object):
                 self.address = ('127.0.0.1', self.address[1])
                 self.socket.bind(self.address)
 
-        log.info('Listening on {0}:{1}'.format(
+        logger.info('Listening on {0}:{1}'.format(
             self.address[0], self.address[1]))
 
         # Run loop
@@ -793,11 +796,11 @@ class Server(object):
                     # get the packet
                     packet = self.socket.recv(self.buffer_size)
                     timestamp = time.time()
-                    log.debug('Received packer: ' + packet.rstrip('\n'))
+                    logger.debug('Received packer: ' + packet.rstrip('\n'))
                     self.poster.submit(packet, timestamp)
 
                     if self.forward is True:
-                        log.debug('Forwarded packet: ' + packet)
+                        logger.debug('Forwarded packet: ' + packet)
                         self.forward_sock.send(packet)
 
             except select.error as e:
@@ -813,7 +816,7 @@ class Server(object):
                 log_exception(e)
 
     def stop(self):
-        log.info("Shutting down")
+        logger.info("Shutting down")
         self.is_running = False
 
 
@@ -831,7 +834,7 @@ class Service(Daemon):
         self.poster = poster
 
     def _handle_sigterm(self, signum, frame):
-        log.debug('Sigterm. Stopping.')
+        logger.debug('Sigterm. Stopping.')
         self.server.stop()
         self.poster.stop()
 
@@ -845,16 +848,12 @@ class Service(Daemon):
                 self.server.start()
 
             except Exception as e:
-                log.exception('Error starting server')
+                logger.exception('Error starting server')
                 raise e
         finally:
             self.poster.stop()
             self.poster.join()
-            log.info("Stopped")
-
-    @classmethod
-    def info(self):
-        log.setLevel(logging.ERROR)
+            logger.info("Stopped")
 
 
 if __name__ == "__main__":
@@ -920,7 +919,7 @@ if __name__ == "__main__":
 
         # setup logging
         log_setup(CONFIG, loglvl, stdout=CONFIG['debug'])
-        log.info('Loaded config from ' + configfile)
+        logger.info('Loaded config from ' + configfile)
 
         # create and element and add metadata
         myElement = Element(CONFIG['hostname'])
@@ -951,7 +950,7 @@ if __name__ == "__main__":
 
         else:
             # do my job loudly!
-            log.debug('debug logging is on')
+            logger.debug('debug logging is on')
             poster.start()
             server.start()
 

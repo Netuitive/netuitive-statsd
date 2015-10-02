@@ -1,8 +1,9 @@
-
 import time
 import logging
 
 import netuitive
+
+logger = logging.getLogger(__name__)
 
 
 class Gauge(object):
@@ -214,6 +215,8 @@ class Element(object):
     """
 
     def __init__(self, elementId, ElementType='SERVER'):
+        logger.debug('__init__ for Element')
+
         self.element = netuitive.Element(ElementType)
         self.elementId = elementId
         self.metrics = {}
@@ -235,6 +238,8 @@ class Element(object):
         self.element.clear_samples()
 
     def add_sample(self, metricId, ts, value, metricType, sign=None, rate=None, sparseDataStrategy='None', unit=''):
+
+        logger.debug('add_sample')
 
         try:
             timestamp = int(ts)
@@ -276,6 +281,7 @@ class Element(object):
     def prepare(self):
 
         try:
+            logger.debug('starting prepare')
             for m in self.metrics:
                 metrics = self.metrics[m].get_values(int(time.time()))
                 metricType = self.metrics[m].metricType
@@ -296,6 +302,8 @@ class Element(object):
                         unit)
 
                 metrics = self.metrics[m].clear()
+
+            logger.debug('finished prepare')
 
         except Exception as e:
             raise(e)
