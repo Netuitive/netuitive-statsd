@@ -19,5 +19,5 @@ clean-test:
 	rm -fr htmlcov/
 
 test:
-	./netuitive-statsd/test_netuitive_statsd.py -v
+	python test_netuitive_statsd.py -v
 

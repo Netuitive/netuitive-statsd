@@ -22,7 +22,7 @@ Vagrant.configure(2) do |config|
 
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "shawnbutts/centos6-dev"
+  config.vm.box = "bento/centos-6.7"
   config.vbguest.auto_update = true
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -38,5 +38,4 @@ Vagrant.configure(2) do |config|
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
   config.vm.network "forwarded_port", guest: 8125, host: 8125
-  config.vm.network "forwarded_port", guest: 8080, host: 8080
 end

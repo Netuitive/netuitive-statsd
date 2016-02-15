@@ -8,11 +8,12 @@ logger = logging.getLogger(__name__)
 
 class Gauge(object):
 
-    def __init__(self, name, sparseDataStrategy='None', unit=''):
+    def __init__(self, name, sparseDataStrategy='None', unit='', tags=[]):
         self.name = name
-        self.metricType = 'gauge'
+        self.metricType = 'GAUGE'
         self.sparseDataStrategy = sparseDataStrategy
         self.unit = unit
+        self.tags = tags
         self.value = float(0)
         self.signed = False
         self.timestamp = int(time.time())
@@ -29,7 +30,7 @@ class Gauge(object):
 
         if sign == '-':
             self.signed = True
-            self.value += float('-' + str(value))
+            self.value -= float(value)
 
     def get_values(self, ts=0):
 
@@ -37,7 +38,7 @@ class Gauge(object):
             timestamp = int(ts)
 
         else:
-            timestamp = self.timestamp
+            timestamp = int(time.time())
 
         ret = {
             self.name: {
@@ -55,11 +56,12 @@ class Gauge(object):
 
 class Counter(object):
 
-    def __init__(self, name, sparseDataStrategy='None', unit=''):
+    def __init__(self, name, sparseDataStrategy='None', unit='', tags=[]):
         self.name = name
-        self.metricType = 'counter'
+        self.metricType = 'GAUGE'
         self.sparseDataStrategy = sparseDataStrategy
         self.unit = unit
+        self.tags = tags
         self.value = float(0)
         self.timestamp = int(time.time())
 
@@ -69,13 +71,13 @@ class Counter(object):
         if rate is None:
             rate = 1.0
 
-        self.value += value * float(1 / rate)
+        self.value += value * float(rate)
 
     def get_values(self, ts=0):
         if ts > 0:
             timestamp = int(ts)
         else:
-            timestamp = self.timestamp
+            timestamp = int(time.time())
 
         ret = {
             self.name: {
@@ -92,17 +94,24 @@ class Counter(object):
 
 class Histogram(object):
 
-    def __init__(self, name, sparseDataStrategy='None', unit=''):
+    def __init__(self, name, sparseDataStrategy='None', unit='', tags=[]):
         self.name = name
         self.sparseDataStrategy = sparseDataStrategy
         self.unit = unit
-        self.count = 0
-        self.metricType = 'histogram'
+        self.tags = tags
+        self.metricType = 'GAUGE'
         self.timestamp = int(time.time())
         self.rate = 1
         self.percentile = 0
         self.samples = []
         self.value = float(0)
+        self.min = None
+        self.max = None
+        self.avg = None
+        self.sum = None
+        self.cnt = 0
+        self.per95 = None
+        self.per99 = None
 
     def add_value(self, value, ts, rate=None, sign=None):
         timestamp = int(ts)
@@ -110,7 +119,7 @@ class Histogram(object):
         if rate is None:
             self.value += value
         else:
-            self.value += value * float(1 / rate)
+            self.value += value * float(rate)
 
         self.samples.append(value)
         self.timestamp = timestamp
@@ -121,71 +130,64 @@ class Histogram(object):
             timestamp = int(ts)
 
         else:
-            timestamp = self.timestamp
+            timestamp = int(time.time())
 
         samlen = len(self.samples)
 
         if samlen > 0:
             self.samples.sort()
-            sammin = float(self.samples[0])
-            sammax = float(self.samples[-1])
-            samavg = float(sum(self.samples) / int(samlen))
-            sammed = float(self.samples[int(round(samlen / 2 - 1))])
-            samper95 = float(self.samples[int(round(0.95 * samlen - 1))])
-            samper99 = float(self.samples[int(round(0.99 * samlen - 1))])
+            self.cnt = samlen
+            self.sum = sum(self.samples)
+            self.min = float(self.samples[0])
+            self.max = float(self.samples[-1])
+            self.avg = float(sum(self.samples) / int(samlen))
+            self.med = float(self.samples[int(round(samlen / 2 - 1))])
+            self.per95 = float(self.samples[int(round(0.95 * samlen - 1))])
+            self.per99 = float(self.samples[int(round(0.99 * samlen - 1))])
 
-            ret = {
-                self.name + '.count': {
-                    'timestamp': timestamp,
-                    'value': samlen
-                },
-                self.name + '.min': {
-                    'timestamp': timestamp,
-                    'value': sammin
-                },
-                self.name + '.max': {
-                    'timestamp': timestamp,
-                    'value': sammax
-                },
-                self.name + '.avg': {
-                    'timestamp': timestamp,
-                    'value': samavg
-                },
-                self.name + '.median': {
-                    'timestamp': timestamp,
-                    'value': sammed
-                },
-                self.name + '.95percentile': {
-                    'timestamp': timestamp,
-                    'value': samper95
-                },
-                self.name + '.99percentile': {
-                    'timestamp': timestamp,
-                    'value': samper99
-                }
+        ret = {
+            self.name: {
+                'timestamp': timestamp,
+                'value': self.value,
+                'avg': self.avg,
+                'cnt': self.cnt,
+                'max': self.max,
+                'min': self.min,
+                'sum': self.sum
             }
+        }
 
         return(ret)
 
     def clear(self):
         self.samples = []
-        self.count = 0
+        self.min = None
+        self.max = None
+        self.avg = None
+        self.sum = None
+        self.cnt = 0
+        self.per95 = None
+        self.per99 = None
         self.value = float(0)
 
 
 class Set(object):
 
-    def __init__(self, name, sparseDataStrategy='None', unit=''):
+    def __init__(self, name, sparseDataStrategy='None', unit='', tags=[]):
         self.name = name
         self.sparseDataStrategy = sparseDataStrategy
         self.unit = unit
-        self.value = set()
+        self.tags = tags
+        self.values = []
         self.timestamp = int(time.time())
-        self.metricType = 'set'
+        self.metricType = 'GAUGE'
 
     def add_value(self, value, ts, sign=None):
         timestamp = int(ts)
-        self.value.add(value)
+        value = 2
+        if str(value) not in self.values:
+            self.values.append(str(value))
+
         self.timestamp = timestamp
 
     def get_values(self, ts=0):
@@ -193,19 +195,21 @@ class Set(object):
             timestamp = int(ts)
 
         else:
-            timestamp = self.timestamp
+            timestamp = int(time.time())
+
+        value = float(len(self.values))
 
         ret = {
             self.name: {
                 'timestamp': timestamp,
-                'value': float(len(self.value))
+                'value': value
             }
         }
 
         return(ret)
 
     def clear(self):
-        self.value.clear()
+        self.values = []
 
 
 class Element(object):
@@ -237,25 +241,38 @@ class Element(object):
         self.metrics.clear()
         self.element.clear_samples()
 
-    def add_sample(self, metricId, ts, value, metricType, sign=None, rate=None, sparseDataStrategy='None', unit=''):
+    def add_sample(self, metricId, ts, value, metricType, sign=None, rate=None, tags=[]):
 
         logger.debug('add_sample')
 
+        unit = ''
+        sparseDataStrategy = 'None'
+
         try:
+
             timestamp = int(ts)
             mtype = self.metric_types[metricType]
+
+            # # reserved tags
+            for t in tags:
+
+                if 'unit' in t:
+                    unit = t['unit']
+
+                if 'sparseDataStrategy' in t:
+                    sparseDataStrategy = t['sparseDataStrategy']
 
             if mtype == 'GAUGE':
                 if metricId not in self.metrics:
                     self.metrics[metricId] = Gauge(
-                        metricId, sparseDataStrategy, unit)
+                        metricId, sparseDataStrategy, unit, tags)
 
                 self.metrics[metricId].add_value(value, timestamp, sign)
 
             if mtype == 'COUNTER':
                 if metricId not in self.metrics:
                     self.metrics[metricId] = Counter(
-                        metricId, sparseDataStrategy, unit)
+                        metricId, sparseDataStrategy, unit, tags)
 
                 self.metrics[metricId].add_value(
                     value, timestamp, rate)
@@ -263,7 +280,7 @@ class Element(object):
             if mtype == 'HISTOGRAM' or mtype == 'TIMER':
                 if metricId not in self.metrics:
                     self.metrics[metricId] = Histogram(
-                        metricId, sparseDataStrategy, unit)
+                        metricId, sparseDataStrategy, unit, tags)
 
                 self.metrics[metricId].add_value(
                     value, timestamp, rate)
@@ -271,7 +288,7 @@ class Element(object):
             if mtype == 'SET':
                 if metricId not in self.metrics:
                     self.metrics[metricId] = Set(
-                        metricId, sparseDataStrategy, unit)
+                        metricId, sparseDataStrategy, unit, tags)
 
                 self.metrics[metricId].add_value(value, timestamp)
 
@@ -283,14 +300,43 @@ class Element(object):
         try:
             logger.debug('starting prepare')
             for m in self.metrics:
-                metrics = self.metrics[m].get_values(int(time.time()))
-                metricType = self.metrics[m].metricType
-                sparseDataStrategy = self.metrics[m].sparseDataStrategy
-                unit = self.metrics[m].unit
 
-                for name in metrics:
-                    timestamp = metrics[name]['timestamp']
-                    value = float(metrics[name]['value'])
+                metric = self.metrics[m]
+                samples = metric.get_values(int(time.time()))
+                metricType = metric.metricType
+                sparseDataStrategy = metric.sparseDataStrategy
+                unit = metric.unit
+
+                tags = metric.tags
+
+                if len(tags) == 0:
+                    tags = None
+
+                for name in samples:
+                    d = samples[name]
+                    mmin = None
+                    mmax = None
+                    mavg = None
+                    msum = None
+                    mcnt = None
+
+                    timestamp = d['timestamp']
+                    value = float(d['value'])
+
+                    if 'min' in d:
+                        mmin = d['min']
+
+                    if 'max' in d:
+                        mmax = d['max']
+
+                    if 'avg' in d:
+                        mavg = d['avg']
+
+                    if 'sum' in d:
+                        msum = d['sum']
+
+                    if 'cnt' in d:
+                        mcnt = d['cnt']
 
                     self.element.add_sample(
                         name,
@@ -299,9 +345,15 @@ class Element(object):
                         metricType,
                         self.elementId,
                         sparseDataStrategy,
-                        unit)
+                        unit,
+                        tags,
+                        mmin,
+                        mmax,
+                        mavg,
+                        msum,
+                        mcnt)
 
-                metrics = self.metrics[m].clear()
+                    metric.clear()
 
             logger.debug('finished prepare')
 

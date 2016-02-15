@@ -1,0 +1,1 @@
+{"attributes": [], "id": "testelement", "metrics": [{"id": "statsd.set", "sparseDataStrategy": "None", "tags": [{"name": "statsdType", "value": "s"}], "type": "GAUGE", "unit": ""}], "name": "testelement", "relations": [], "samples": [{"metricId": "statsd.set", "timestamp": TIMESTAMP_TEMPLATE, "val": 1.0}], "tags": [], "type": "SERVER"}
