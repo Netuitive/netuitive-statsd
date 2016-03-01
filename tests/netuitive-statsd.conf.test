@@ -1,0 +1,46 @@
+[server]
+
+pid_file = ./netuitive-statsd.pid
+
+[handlers]
+
+[[NetuitiveHandler]]
+
+### NetuitiveCloud URL to post the metrics
+url = https://api.app.netuitive.com/ingest/infrastructure
+
+### NetuitiveClound Datasource api key
+api_key = <valid api key>
+
+[[[statsd]]]
+interval = 10
+listen_port = 8125
+listen_ip = 127.0.0.1
+element_type = SERVER
+prefix = statsd
+forward_ip = 127.0.0.2
+forward_port = 8125
+forward = True
+
+[collectors]
+
+[[default]]
+hostname = statsd-test-host
+
+
+[logger_root]
+
+# to increase verbosity, set DEBUG
+level = INFO
+handlers = rotated_file
+propagate = 1
+
+[handler_rotated_file]
+
+class = handlers.TimedRotatingFileHandler
+level = DEBUG
+formatter = default
+# rotate at midnight, each day and keep 7 days
+args = ('./netuitive-statsd.log', 'midnight', 1, 7)
+
+
