@@ -29,6 +29,11 @@ Requirements
 History
 -------
 
+Version 0.0.2 - Mar 11 2016
+---------------------------
+
+* Fix memory usage in error condition
+
 Version 0.0.1 - Feb 29 2016
 ---------------------------
 

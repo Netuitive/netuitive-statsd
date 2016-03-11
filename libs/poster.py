@@ -133,10 +133,8 @@ class Poster(threading.Thread):
                                 logging.info('Data posted Successfully. '
                                              'Next log message in 15 minutes.')
 
-                            self.elements.clear_samples(ename)
-
                         else:
-                            logger.warning(
+                            logger.error(
                                 "Failed to send {0} elements with "
                                 "{1} samples total".format(ec, sc))
 
@@ -156,6 +154,7 @@ class Poster(threading.Thread):
                             "titled {0}".format(event.title))
 
                 # reset
+                self.elements.clear_samples(ename)
                 self.sample_count = 0
                 self.packet_count = 0
                 self.event_count = 0
