@@ -15,7 +15,7 @@ Features
 
 Usage
 -----
-See [USAGE](USAGE.md)
+See [USAGE.md](USAGE.md)
 
 
 Requirements
@@ -29,7 +29,7 @@ Requirements
 History
 -------
 
-See [HISTORY](HISTORY.md)
+See [HISTORY.md](HISTORY.md)
 
 
 Copyright and License
