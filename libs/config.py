@@ -12,12 +12,24 @@ logger = logging.getLogger(__name__)
 
 def config(args=None):
 
+    # try to find the hostname
+    hostname = socket.getfqdn().split('.')[0]
+
+    if hostname == 'localhost':
+        hostname = socket.gethostname().split('.')[0]
+
+    if hostname == 'localhost':
+        hostname = os.uname()[1].split('.')[0]
+
+    if hostname == 'localhost':
+        logger.error('could not determine hostname')
+
     # default config
     ret = {
         'enabled': True,
         'url': 'https://api.app.netuitive.com/ingest',
         'api_key': None,
-        'hostname': socket.getfqdn().split('.')[0],
+        'hostname': hostname,
         'interval': 60,
         'element_type': 'SERVER',
         'prefix': 'statsd',

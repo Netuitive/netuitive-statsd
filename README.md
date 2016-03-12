@@ -29,6 +29,11 @@ Requirements
 History
 -------
 
+
+Version 0.0.3 - Mar 12 2016
+---------------------------
+* improve hostname detection
+
 Version 0.0.2 - Mar 11 2016
 ---------------------------
 
