@@ -1,4 +1,4 @@
-Netuitive StatsD Server [![Build Status](https://travis-ci.org/Netuitive/netuitive-statsd.svg?branch=master)](https://travis-ci.org/Netuitive/netuitive-statsd)
+Netuitive StatsD Server [![Build Status](https://travis-ci.org/Netuitive/netuitive-statsd.svg?branch=master)](https://travis-ci.org/Netuitive/netuitive-statsd) [![Coverage Status](https://coveralls.io/repos/github/Netuitive/netuitive-statsd/badge.svg?branch=master)](https://coveralls.io/github/Netuitive/netuitive-statsd?branch=master)
 =======================
 
 >**Note:** This is already installed as part of the Netuitive Linux Agent package and does not need to be installed separately.

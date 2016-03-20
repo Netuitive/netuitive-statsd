@@ -3,3 +3,4 @@ tox-pyenv
 mock
 flake8
 coverage
+coveralls
