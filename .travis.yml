@@ -23,7 +23,7 @@ script:
     - make test
 
 after_success:
-    make coverage
-
+  - make coverage
+  - coveralls
 
 

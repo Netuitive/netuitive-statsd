@@ -1,4 +1,4 @@
-Netuitive StatsD Server <img src="https://travis-ci.org/Netuitive/netuitive-statsd.svg?branch=master"/>
+Netuitive StatsD Server [![Build Status](https://travis-ci.org/Netuitive/netuitive-statsd.svg?branch=master)](https://travis-ci.org/Netuitive/netuitive-statsd) [![Coverage Status](https://coveralls.io/repos/github/Netuitive/netuitive-statsd/badge.svg?branch=master)](https://coveralls.io/github/Netuitive/netuitive-statsd?branch=master)
 =======================
 
 >**Note:** This is already installed as part of the Netuitive Linux Agent package and does not need to be installed separately.
@@ -15,7 +15,7 @@ Features
 
 Usage
 -----
-See [usage doc](USAGE.md)
+See [USAGE.md](USAGE.md)
 
 
 Requirements
@@ -29,20 +29,7 @@ Requirements
 History
 -------
 
-
-Version 0.0.3 - Mar 12 2016
----------------------------
-* improve hostname detection
-
-Version 0.0.2 - Mar 11 2016
----------------------------
-
-* Fix memory usage in error condition
-
-Version 0.0.1 - Feb 29 2016
----------------------------
-
-* First release
+See [HISTORY.md](HISTORY.md)
 
 
 Copyright and License
