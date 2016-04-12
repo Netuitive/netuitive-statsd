@@ -16,7 +16,7 @@ class Poster(threading.Thread):
     Thread for posting the collected data to Netuitive's API
     """
 
-    def __init__(self, config, element):
+    def __init__(self, config, element, version='develop'):
         logger.debug('Poster')
         threading.Thread.__init__(self)
         self.setName('PosterThread')
@@ -32,7 +32,9 @@ class Poster(threading.Thread):
         self.flush_time = 0
         logger.debug('Messages will be sent to ' + self.config['url'])
 
-        self.api = netuitive.Client(self.config['url'], self.config['api_key'])
+        self.api = netuitive.Client(self.config['url'],
+                                    self.config['api_key'],
+                                    agent='Netuitive-Statsd/' + str(version))
 
         self.interval = int(self.config['interval'])
         self.hostname = config['hostname']
