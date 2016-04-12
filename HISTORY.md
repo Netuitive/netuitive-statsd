@@ -1,6 +1,10 @@
 History
 -------
 
+Version 0.0.4 - Apr 12 2016
+---------------------------
+* improve agent string
+* improve test coverage
 
 Version 0.0.3 - Mar 12 2016
 ---------------------------
