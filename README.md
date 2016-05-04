@@ -1,7 +1,14 @@
-Netuitive StatsD Server <img src="https://travis-ci.org/Netuitive/netuitive-statsd.svg?branch=master"/>
+Netuitive StatsD Server 
 =======================
 
->**Note:** This is already installed as part of the Netuitive Linux Agent package and does not need to be installed separately.
+[![Build Status](https://travis-ci.org/Netuitive/netuitive-statsd.svg?branch=master)](https://travis-ci.org/Netuitive/netuitive-statsd) [![Coverage Status](https://coveralls.io/repos/github/Netuitive/netuitive-statsd/badge.svg?branch=master)](https://coveralls.io/github/Netuitive/netuitive-statsd?branch=master)
+
+>**Note:** This is already installed as part of the [Netuitive Linux Agent](https://help.netuitive.com/Content/Misc/Datasources/Netuitive/new_netuitive_datasource.htm) package and does not need to be installed separately.
+
+The Netuitive StatsD Server interprets, aggregates, and forwards custom metrics generated from your application. Using the values instrumented from your application's key actions and data (method calls, database queries, etc.), Netuitive aggregates the values, associates them with corresponding metrics, and analyzes them in our analytics cycles.
+
+For more information on the Netuitive StatsD Server, see our [help docs](https://help.netuitive.com/Content/Misc/Datasources/Netuitive/new_netuitive_datasource.htm#kanchor275), or contact Netuitive support at [support@netuitive.com](mailto:support@netuitive.com).
+
 
 Features
 --------
