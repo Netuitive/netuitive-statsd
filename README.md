@@ -10,7 +10,7 @@ The Netuitive StatsD Server interprets, aggregates, and forwards custom metrics 
 For more information on the Netuitive StatsD Server, see our [help docs](https://help.netuitive.com/Content/Misc/Datasources/Netuitive/new_netuitive_datasource.htm#kanchor275), or contact Netuitive support at [support@netuitive.com](mailto:support@netuitive.com).
 
 Requirements
--------------
+------------
 
 - Python >= 2.7 or >= 3.3
 - See [requirements.txt](requirements.txt) for Python modules
@@ -23,20 +23,10 @@ See the [usage doc](USAGE.md).
 Additional Information
 ----------------------
 
-### History
+See [HISTORY.md](HISTORY.md)
 
-#### Version 0.0.3 - Mar 12 2016
 
-* improve hostname detection
-
-#### Version 0.0.2 - Mar 11 2016
-
-* Fix memory usage in error condition
-
-#### Version 0.0.1 - Feb 29 2016
-
-* First release
-
-### Copyright and License
+Copyright and License
+---------------------
 
 Copyright 2016 Netuitive, Inc. under [the Apache 2.0 license](LICENSE).

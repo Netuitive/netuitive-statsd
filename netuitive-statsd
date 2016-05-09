@@ -64,7 +64,7 @@ from setproctitle import setproctitle
 import libs
 
 # Constants
-__version__ = "0.0.2"
+__version__ = "0.0.4"
 __author__ = "Netuitive, Inc."
 __license__ = "Apache 2.0"
 
@@ -94,7 +94,7 @@ if __name__ == "__main__":
             myElement = libs.Element(cfg['hostname'])
 
             # setup Netuitive API posting thread
-            poster = libs.Poster(cfg, myElement)
+            poster = libs.Poster(cfg, myElement, __version__)
 
             # setup StatsD server
             server = libs.Server(cfg, poster)

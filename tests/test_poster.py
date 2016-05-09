@@ -45,7 +45,13 @@ class Test_Poster(unittest.TestCase):
         self.poster = libs.Poster(self.config, self.myElement)
         self.poster.start()
 
+        self.poster2 = libs.Poster(self.config, self.myElement, 8)
+
         self.lock = threading.Lock()
+
+    def test_Poster_config(self):
+        self.assertEqual(self.poster.api.agent, 'Netuitive-Statsd/develop')
+        self.assertEqual(self.poster2.api.agent, 'Netuitive-Statsd/8')
 
     def test_single_counter(self):
 
