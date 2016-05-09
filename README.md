@@ -1,4 +1,4 @@
-Netuitive StatsD Server 
+Netuitive StatsD Server
 =======================
 
 [![Build Status](https://travis-ci.org/Netuitive/netuitive-statsd.svg?branch=master)](https://travis-ci.org/Netuitive/netuitive-statsd) [![Coverage Status](https://coveralls.io/repos/github/Netuitive/netuitive-statsd/badge.svg?branch=master)](https://coveralls.io/github/Netuitive/netuitive-statsd?branch=master)
@@ -18,7 +18,7 @@ Requirements
 
 Using the Netuitive StatsD Server
 ----------------------------------
-See the [usage doc](USAGE.md).
+See the [USAGE.md](USAGE.md).
 
 Additional Information
 ----------------------
