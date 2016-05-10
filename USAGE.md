@@ -83,6 +83,7 @@ Reserved Metric Tags
 | Tag  | Meaning  |
 | ---- | -------- |
 | h | hostname (elementId)  |
+| ty | element type (SERVER)  |
 | un | sets the unit of the metric (bits, bytes, etc) |
 | sds | sets the sparse data strategy (ReplaceWithZero, etc) |
 

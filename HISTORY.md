@@ -1,6 +1,11 @@
 History
 -------
 
+Version 0.0.5 - Apr XX XXXX
+---------------------------
+* fix element type configuration
+* add 'ty' reserved tag
+
 Version 0.0.4 - Apr 12 2016
 ---------------------------
 * improve agent string

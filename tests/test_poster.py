@@ -40,12 +40,34 @@ class Test_Poster(unittest.TestCase):
                        'foreground': False,
                        'url': 'http://test.com'}
 
+        self.config2 = {'api_key': 'testapiket',
+                        'debug': True,
+                        'element_type': 'NOTSERVER',
+                        'forward': False,
+                        'forward_ip': None,
+                        'forward_port': None,
+                        'hostname': 'testelement2',
+                        'interval': 60,
+                        'listen_ip': '127.0.0.1',
+                        'configfile': 'test.cfg',
+                        'listen_port': 8125,
+                        'prefix': 'statsd',
+                        'foreground': False,
+                        'url': 'http://test.com'}
+
         self.timestamp = 1434110794
-        self.myElement = libs.Element(self.config['hostname'])
+
+        self.myElement = libs.Element(
+            self.config['hostname'], self.config['element_type'])
         self.poster = libs.Poster(self.config, self.myElement)
         self.poster.start()
 
         self.poster2 = libs.Poster(self.config, self.myElement, 8)
+
+        self.myElement2 = libs.Element(
+            self.config2['hostname'], self.config2['element_type'])
+        self.poster3 = libs.Poster(self.config2, self.myElement2)
+        self.poster3.start()
 
         self.lock = threading.Lock()
 
@@ -737,9 +759,132 @@ class Test_Poster(unittest.TestCase):
 
             self.assertEqual(j, f)
 
+    def test_element_type_tag(self):
+
+        with self.lock:
+
+            self.poster3.submit('gauge:1|g|#ty:MyType', self.timestamp)
+
+            for ename in self.poster3.elements.elements:
+                e = self.poster3.elements.elements[ename]
+                e.prepare()
+
+            j = json.loads(json.dumps(
+                self.poster3.elements.elements, default=lambda o: o.__dict__,
+                sort_keys=True))
+
+            element = e.element
+
+            f = {'testelement2': {'element': {'attributes': [],
+                                              'id': 'testelement2',
+                                              'metrics': [{'id': 'statsd.gauge',
+                                                           'sparseDataStrategy': 'None',
+                                                           'tags': [{'name': 'statsdType',
+                                                                     'value': 'g'}],
+                                                           'type': 'GAUGE',
+                                                           'unit': ''}],
+                                              'name': 'testelement2',
+                                              'relations': [],
+                                              'samples': [{'avg': 1.0,
+                                                           'cnt': 1,
+                                                           'max': 1.0,
+                                                           'metricId': 'statsd.gauge',
+                                                           'min': 1.0,
+                                                           'sum': 1.0,
+                                                           'timestamp': element.samples[0].timestamp,
+                                                           'val': 1.0}],
+                                              'tags': [],
+                                              'type': 'MyType'},
+                                  'elementId': 'testelement2',
+                                  'metric_types': {'c': 'COUNTER',
+                                                   'g': 'GAUGE',
+                                                   'h': 'HISTOGRAM',
+                                                   'ms': 'TIMER',
+                                                   's': 'SET'},
+                                  'metrics': {'statsd.gauge': {'avg': None,
+                                                               'cnt': 0.0,
+                                                               'max': None,
+                                                               'metricType': 'GAUGE',
+                                                               'min': None,
+                                                               'name': 'statsd.gauge',
+                                                               'orgtype': ['GAUGE'],
+                                                               'samples': [1.0],
+                                                               'signed': False,
+                                                               'sparseDataStrategy': 'None',
+                                                               'sum': None,
+                                                               'tags': [{'statsdType': 'g'}],
+                                                               'timestamp': self.poster3.elements.elements['testelement2'].metrics['statsd.gauge'].timestamp,
+                                                               'unit': '',
+                                                               'value': 0.0}}}}
+
+            self.poster3.elements.delete('testelement2')
+            self.assertEqual(j, f)
+
+    def test_element_type(self):
+
+        with self.lock:
+
+            self.poster3.submit('gauge:1|g', self.timestamp)
+
+            for ename in self.poster3.elements.elements:
+                e = self.poster3.elements.elements[ename]
+                e.prepare()
+
+            j = json.loads(json.dumps(
+                self.poster3.elements.elements, default=lambda o: o.__dict__,
+                sort_keys=True))
+
+            element = e.element
+
+            f = {'testelement2': {'element': {'attributes': [],
+                                              'id': 'testelement2',
+                                              'metrics': [{'id': 'statsd.gauge',
+                                                           'sparseDataStrategy': 'None',
+                                                           'tags': [{'name': 'statsdType',
+                                                                     'value': 'g'}],
+                                                           'type': 'GAUGE',
+                                                           'unit': ''}],
+                                              'name': 'testelement2',
+                                              'relations': [],
+                                              'samples': [{'avg': 1.0,
+                                                           'cnt': 1,
+                                                           'max': 1.0,
+                                                           'metricId': 'statsd.gauge',
+                                                           'min': 1.0,
+                                                           'sum': 1.0,
+                                                           'timestamp': element.samples[0].timestamp,
+                                                           'val': 1.0}],
+                                              'tags': [],
+                                              'type': 'NOTSERVER'},
+                                  'elementId': 'testelement2',
+                                  'metric_types': {'c': 'COUNTER',
+                                                   'g': 'GAUGE',
+                                                   'h': 'HISTOGRAM',
+                                                   'ms': 'TIMER',
+                                                   's': 'SET'},
+                                  'metrics': {'statsd.gauge': {'avg': None,
+                                                               'cnt': 0.0,
+                                                               'max': None,
+                                                               'metricType': 'GAUGE',
+                                                               'min': None,
+                                                               'name': 'statsd.gauge',
+                                                               'orgtype': ['GAUGE'],
+                                                               'samples': [1.0],
+                                                               'signed': False,
+                                                               'sparseDataStrategy': 'None',
+                                                               'sum': None,
+                                                               'tags': [{'statsdType': 'g'}],
+                                                               'timestamp': self.poster3.elements.elements['testelement2'].metrics['statsd.gauge'].timestamp,
+                                                               'unit': '',
+                                                               'value': 0.0}}}}
+
+            self.poster3.elements.delete('testelement2')
+            self.assertEqual(j, f)
+
     def tearDown(self):
         self.poster.stop()
-
+        self.poster2.stop()
+        self.poster3.stop()
 
 if __name__ == '__main__':
     unittest.main()

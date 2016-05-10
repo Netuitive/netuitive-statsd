@@ -91,7 +91,7 @@ if __name__ == "__main__":
         if cfg['enabled']:
 
             # create and element and add metadata
-            myElement = libs.Element(cfg['hostname'])
+            myElement = libs.Element(cfg['hostname'], cfg['element_type'])
 
             # setup Netuitive API posting thread
             poster = libs.Poster(cfg, myElement, __version__)
