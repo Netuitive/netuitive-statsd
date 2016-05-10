@@ -47,7 +47,8 @@ class Elements(object):
                 elementId = self.hostname
 
             if elementId not in self.elements:
-                self.elements[elementId] = Element(elementId)
+                self.elements[elementId] = Element(
+                    elementId, self.element.type)
 
             self.elements[elementId].add_sample(
                 metricId, timestamp, value, metricType, sign, rate, tags)
@@ -81,7 +82,7 @@ class Element(object):
     An entity that represents an element
     """
 
-    def __init__(self, elementId, ElementType='SERVER'):
+    def __init__(self, elementId, ElementType=None):
         logger.debug('__init__ for Element')
 
         self.element = netuitive.Element(ElementType)
@@ -127,6 +128,11 @@ class Element(object):
                 # check for sparse data tag
                 if 'sds' in t:
                     sparseDataStrategy = t['sds']
+
+                # check for sparse data tag
+                if 'ty' in t:
+                    self.element.type = t['ty']
+                    tags.remove(t)
 
             if metricId in self.metrics:
 

@@ -1,29 +1,21 @@
-# http://blog.travis-ci.com/2014-12-17-faster-builds-with-container-based-infrastructure/
 sudo: false
-
 language: python
 python:
-  - "2.7"
-  - "3.3"
-  - "3.4"
-  - "3.5"
-
-
+- '2.7'
+- '3.3'
+- '3.4'
+- '3.5'
 cache:
   directories:
-    - $HOME/.cache/pip
-
-# command to install dependencies, e.g. pip install -r requirements.txt
+  - $HOME/.cache/pip
 install:
-    - pip install -r dev-requirements.txt
-
-# command to run tests, e.g. python setup.py test
+- pip install -r dev-requirements.txt
 script:
-    - make lint
-    - make test
-
+- make lint
+- make test
 after_success:
-  - make coverage
-  - coveralls
-
-
+- make coverage
+- coveralls
+notifications:
+  slack:
+    secure: dkLGDo99kuSIZrU6wxBrLp8XNoeYrkgHq95XZ7IMErjmbDyO9HHm2r6IA/Y6gPW2D92l2Q0khtQvMeTR9e+vGfw0gXoPkiZjZXg9suK6k1sFmjwYIh8hmZJNGK/nrVA/E/UI4Fs5nezNldWIT7BPCCAPVXem18nwcFGiyhWOwJvOsN7c611JXT/ZDYrq0MeIbmSveC1tt/cOafHtbVkXbfqXnHB0Hzb3AymaZz0Tq776tabZRgxjqruds/A3myXW3zROP8UNw+TLXSbKuZacGllHVwKEbVru6akD2+H76+aGoOFZROxpYZdqicHFR/x8x/ah38kSbVsZf7tmFlmb6+IkNtBShism34UQV13vVqs/yUgePKyM2QJIQOgt2QlVA3As1hLHxCDSmpPagQIdo89Ti9PiX8NNad9WHouSuZquyNHaaMYwzjG38JNF4tMMUJbJBhnWkzfonEKHPuBR8dRC2TC4s0MH6tIAn3yO9i+pPtBn8JTh5EeCgoZ0RK5wEa16ikiUgrkAJbNJlGUdeQP2tj9IgL2y7jV3WE2bnl9vWNfX1Tvc0Fho9dUoA3iNr2JXxROAljbggrbE39G+hCxqNmB/x0MF9YxMIDrY5bKC/hu9k0XGGEYfEewt5kNsWE7tgokZEn6DT8LPYrP/lXLPhrL4ZIICX+5t4yd5cfE=
