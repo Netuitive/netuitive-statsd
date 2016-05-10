@@ -1,7 +1,7 @@
 History
 -------
 
-Version 0.0.5 - Apr XX XXXX
+Version 0.0.5 - May 10 2016
 ---------------------------
 * fix element type configuration
 * add 'ty' reserved tag
