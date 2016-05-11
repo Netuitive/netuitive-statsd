@@ -47,8 +47,9 @@ class Elements(object):
                 elementId = self.hostname
 
             if elementId not in self.elements:
+                logger.debug('creating element:' + str(elementId))
                 self.elements[elementId] = Element(
-                    elementId, self.element.type)
+                    elementId, self.element.element.type)
 
             self.elements[elementId].add_sample(
                 metricId, timestamp, value, metricType, sign, rate, tags)

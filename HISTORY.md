@@ -1,6 +1,12 @@
 History
 -------
 
+Version 0.0.6 - May 11 2016
+---------------------------
+* fix element type
+* improve logging
+
+
 Version 0.0.5 - May 10 2016
 ---------------------------
 * fix element type configuration
