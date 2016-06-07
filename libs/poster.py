@@ -125,6 +125,7 @@ class Poster(threading.Thread):
 
                         # do the post
                         if self.api.post(element):
+                            self.elements.clear_samples(ename)
                             logger.debug(
                                 "Successfully sent {0} elements with "
                                 "{1} samples total".format(ec, sc))
@@ -156,7 +157,6 @@ class Poster(threading.Thread):
                             "titled {0}".format(event.title))
 
                 # reset
-                self.elements.clear_samples(ename)
                 self.sample_count = 0
                 self.packet_count = 0
                 self.event_count = 0

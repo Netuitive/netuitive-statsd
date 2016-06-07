@@ -9,6 +9,7 @@ Tests for `netuitivestatsd` module.
 """
 
 import unittest
+import mock
 import json
 import logging
 import threading
@@ -18,6 +19,34 @@ import libs
 logging.basicConfig()
 logging.disable(logging.ERROR)
 logger = logging.getLogger(__name__)
+
+
+class MockResponse(object):
+
+    def __init__(self,
+                 resp_data='',
+                 headers={'content-type': 'text/plain; charset=utf-8'},
+                 code=200,
+                 msg='OK',
+                 resp_headers=None):
+
+        self.resp_data = resp_data
+        self.code = code
+        self.msg = msg
+        self.headers = headers
+        self.resp_headers = resp_headers
+
+    def read(self):
+        return self.resp_data
+
+    def info(self):
+        return dict(self.resp_headers)
+
+    def getcode(self):
+        return self.code
+
+    def close(self):
+        return True
 
 
 class Test_Poster(unittest.TestCase):
@@ -68,6 +97,11 @@ class Test_Poster(unittest.TestCase):
             self.config2['hostname'], self.config2['element_type'])
         self.poster3 = libs.Poster(self.config2, self.myElement2)
         self.poster3.start()
+
+        self.myElement3 = libs.Element(
+            self.config['hostname'], self.config['element_type'])
+        self.poster4 = libs.Poster(self.config, self.myElement3)
+        self.poster4.start()
 
         self.lock = threading.Lock()
 
@@ -881,10 +915,98 @@ class Test_Poster(unittest.TestCase):
             self.poster3.elements.delete('testelement2')
             self.assertEqual(j, f)
 
+    @mock.patch('netuitive.client.urllib2.urlopen')
+    @mock.patch('netuitive.client.logging')
+    def test_sample_cleared(self, mock_logging, mock_post):
+
+        mock_post.return_value = MockResponse(code=200)
+
+        with self.lock:
+            self.poster4.submit('counter:1|c', self.timestamp)
+            self.poster4.submit('counter:1|c|#h:host1', self.timestamp)
+            self.poster4.submit('counter:1|c|#h:host2', self.timestamp)
+            self.poster4.submit('counter:1|c|#h:host3', self.timestamp)
+
+            self.poster4.submit('counter:1|c', self.timestamp)
+            self.poster4.submit('counter:1|c|#h:host1', self.timestamp)
+            self.poster4.submit('counter:1|c|#h:host2', self.timestamp)
+            self.poster4.submit('counter:1|c|#h:host3', self.timestamp)
+
+            for ename in self.poster4.elements.elements:
+                e = self.poster4.elements.elements[ename]
+                e.prepare()
+
+            j = json.loads(json.dumps(
+                self.poster4.elements, default=lambda o: o.__dict__,
+                sort_keys=True))
+
+            # everything should have 1 sample
+            self.assertEqual(
+                len(j['elements']['testelement']['element']['samples']), 1)
+
+            self.assertEqual(
+                len(j['elements']['host1']['element']['samples']), 1)
+
+            self.assertEqual(
+                len(j['elements']['host2']['element']['samples']), 1)
+
+            self.assertEqual(
+                len(j['elements']['host3']['element']['samples']), 1)
+
+            # everything should have 1 metric
+            self.assertEqual(
+                len(j['elements']['testelement']['element']['metrics']), 1)
+
+            self.assertEqual(
+                len(j['elements']['host1']['element']['metrics']), 1)
+
+            self.assertEqual(
+                len(j['elements']['host2']['element']['metrics']), 1)
+
+            self.assertEqual(
+                len(j['elements']['host3']['element']['metrics']), 1)
+
+            self.poster4.flush()
+
+            j = json.loads(json.dumps(
+                self.poster4.elements, default=lambda o: o.__dict__,
+                sort_keys=True))
+
+            self.assertEqual(
+                len(j['elements']['testelement']['element']['samples']), 0)
+
+            self.assertEqual(
+                len(j['elements']['host1']['element']['samples']), 0)
+
+            self.assertEqual(
+                len(j['elements']['host2']['element']['samples']), 0)
+
+            self.assertEqual(
+                len(j['elements']['host3']['element']['samples']), 0)
+
+            # everything should have 0 metric
+            self.assertEqual(
+                len(j['elements']['testelement']['element']['metrics']), 0)
+
+            self.assertEqual(
+                len(j['elements']['host1']['element']['metrics']), 0)
+
+            self.assertEqual(
+                len(j['elements']['host2']['element']['metrics']), 0)
+
+            self.assertEqual(
+                len(j['elements']['host3']['element']['metrics']), 0)
+
+            self.poster4.elements.delete('testelement')
+            self.poster4.elements.delete('host1')
+            self.poster4.elements.delete('host2')
+            self.poster4.elements.delete('host3')
+
     def tearDown(self):
         self.poster.stop()
         self.poster2.stop()
         self.poster3.stop()
+        self.poster4.stop()
 
 if __name__ == '__main__':
     unittest.main()
