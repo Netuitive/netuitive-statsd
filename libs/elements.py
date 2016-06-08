@@ -61,6 +61,11 @@ class Elements(object):
     def delete(self, elementId):
         del self.elements[elementId]
 
+    def delete_all(self):
+        self.elements = {}
+        self.element.metrics = {}
+        self.elements[self.hostname] = self.element
+
     def clear_samples(self, elementId=None, everything=False):
         logger.debug('Element.clear_samples for ' + str(elementId))
         try:

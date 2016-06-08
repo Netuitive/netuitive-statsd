@@ -41,6 +41,9 @@ class Poster(threading.Thread):
         self.events = []
         self.elements = Elements(self.hostname, element)
 
+        self.flush_error_count = 0
+        self.flush_error_max = max(self.interval * 15, 900)
+
     def stop(self):
         logger.debug("Poster Shutting down")
         self.runner.set()
@@ -54,7 +57,11 @@ class Poster(threading.Thread):
             logger.debug('Waiting {0} seconds'.format(self.interval))
             self.runner.wait(self.interval)
             logger.debug('Flushing')
-            self.flush()
+            if self.flush():
+                logger.debug('Flush sucessful')
+
+            else:
+                logger.error('Error during flush')
 
     def flush(self):
         """
@@ -63,6 +70,16 @@ class Poster(threading.Thread):
 
         try:
             with self.lock:
+                if self.flush_error_count >= self.flush_error_max:
+                    logger.error(
+                        'failed to post for at least {0} seconds. '.format(
+                            self.flush_error_max) +
+                        'dropping data to prevent memory starvation.'
+                    )
+
+                    self.elements.delete_all()
+                    return(False)
+
                 timestamp = int(time.time())
 
                 # add some of our internal metric samples
@@ -161,9 +178,13 @@ class Poster(threading.Thread):
                 self.packet_count = 0
                 self.event_count = 0
                 self.events = []
+                return(True)
 
         except Exception as e:
             logger.error(e, exc_info=True)
+
+        self.flush_error_count += self.interval
+        return(False)
 
     def submit(self, message, ts):
         """
