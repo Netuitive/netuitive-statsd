@@ -103,6 +103,11 @@ class Test_Poster(unittest.TestCase):
         self.poster4 = libs.Poster(self.config, self.myElement3)
         self.poster4.start()
 
+        self.myElement4 = libs.Element(
+            self.config['hostname'], self.config['element_type'])
+        self.poster5 = libs.Poster(self.config, self.myElement4)
+        self.poster5.start()
+
         self.lock = threading.Lock()
 
     def test_Poster_config(self):
@@ -916,8 +921,7 @@ class Test_Poster(unittest.TestCase):
             self.assertEqual(j, f)
 
     @mock.patch('netuitive.client.urllib2.urlopen')
-    @mock.patch('netuitive.client.logging')
-    def test_sample_cleared(self, mock_logging, mock_post):
+    def test_sample_cleared(self, mock_post):
 
         mock_post.return_value = MockResponse(code=200)
 
@@ -936,9 +940,7 @@ class Test_Poster(unittest.TestCase):
                 e = self.poster4.elements.elements[ename]
                 e.prepare()
 
-            j = json.loads(json.dumps(
-                self.poster4.elements, default=lambda o: o.__dict__,
-                sort_keys=True))
+            j = self.poster4.elements
 
             # everything should have 1 sample
             self.assertEqual(
@@ -968,9 +970,7 @@ class Test_Poster(unittest.TestCase):
 
             self.poster4.flush()
 
-            j = json.loads(json.dumps(
-                self.poster4.elements, default=lambda o: o.__dict__,
-                sort_keys=True))
+            j = self.poster4.elements
 
             self.assertEqual(
                 len(j['elements']['testelement']['element']['samples']), 0)
@@ -1002,11 +1002,150 @@ class Test_Poster(unittest.TestCase):
             self.poster4.elements.delete('host2')
             self.poster4.elements.delete('host3')
 
+    @mock.patch('netuitive.client.urllib2.urlopen')
+    def test_sample_cleared(self, mock_post):
+
+        mock_post.return_value = MockResponse(code=200)
+
+        with self.lock:
+            self.poster4.submit('counter:1|c', self.timestamp)
+            self.poster4.submit('counter:1|c|#h:host1', self.timestamp)
+            self.poster4.submit('counter:1|c|#h:host2', self.timestamp)
+            self.poster4.submit('counter:1|c|#h:host3', self.timestamp)
+
+            self.poster4.submit('counter:1|c', self.timestamp)
+            self.poster4.submit('counter:1|c|#h:host1', self.timestamp)
+            self.poster4.submit('counter:1|c|#h:host2', self.timestamp)
+            self.poster4.submit('counter:1|c|#h:host3', self.timestamp)
+
+            for ename in self.poster4.elements.elements:
+                e = self.poster4.elements.elements[ename]
+                e.prepare()
+
+            j = self.poster4.elements
+
+            # everything should have 1 sample
+            self.assertEqual(
+                len(j.elements['testelement'].element.samples), 1)
+
+            self.assertEqual(
+                len(j.elements['host1'].element.samples), 1)
+
+            self.assertEqual(
+                len(j.elements['host2'].element.samples), 1)
+
+            self.assertEqual(
+                len(j.elements['host3'].element.samples), 1)
+
+            # everything should have 1 metric
+            self.assertEqual(
+                len(j.elements['testelement'].element.metrics), 1)
+
+            self.assertEqual(
+                len(j.elements['host1'].element.metrics), 1)
+
+            self.assertEqual(
+                len(j.elements['host2'].element.metrics), 1)
+
+            self.assertEqual(
+                len(j.elements['host3'].element.metrics), 1)
+
+            self.poster4.flush()
+
+            j = self.poster4.elements
+
+            self.assertEqual(
+                len(j.elements['testelement'].element.samples), 0)
+
+            self.assertEqual(len(j.elements['host1'].element.samples), 0)
+
+            self.assertEqual(len(j.elements['host2'].element.samples), 0)
+
+            self.assertEqual(len(j.elements['host3'].element.samples), 0)
+
+            # everything should have 0 metric
+            self.assertEqual(
+                len(j.elements['testelement'].element.metrics), 0)
+
+            self.assertEqual(
+                len(j.elements['host1'].element.metrics), 0)
+
+            self.assertEqual(
+                len(j.elements['host2'].element.metrics), 0)
+
+            self.assertEqual(
+                len(j.elements['host3'].element.metrics), 0)
+
+            self.poster4.elements.delete('testelement')
+            self.poster4.elements.delete('host1')
+            self.poster4.elements.delete('host2')
+            self.poster4.elements.delete('host3')
+
+    @mock.patch('libs.poster.logger')
+    def test_memory_safety(self, mock_logging):
+
+        with self.lock:
+            self.poster5.submit('counter:1|c', self.timestamp)
+            self.poster5.submit('counter:1|c|#h:host1', self.timestamp)
+            self.poster5.submit('counter:1|c|#h:host2', self.timestamp)
+            self.poster5.submit('counter:1|c|#h:host3', self.timestamp)
+
+            self.poster5.submit('counter:1|c', self.timestamp)
+            self.poster5.submit('counter:1|c|#h:host1', self.timestamp)
+            self.poster5.submit('counter:1|c|#h:host2', self.timestamp)
+            self.poster5.submit('counter:1|c|#h:host3', self.timestamp)
+
+            for ename in self.poster5.elements.elements:
+                e = self.poster5.elements.elements[ename]
+                e.prepare()
+
+            j = self.poster5.elements
+
+            # everything should have 1 sample
+            self.assertEqual(
+                len(j.elements['testelement'].element.samples), 1)
+
+            self.assertEqual(
+                len(j.elements['host1'].element.samples), 1)
+
+            self.assertEqual(
+                len(j.elements['host2'].element.samples), 1)
+
+            self.assertEqual(
+                len(j.elements['host3'].element.samples), 1)
+
+            # everything should have 1 metric
+            self.assertEqual(
+                len(j.elements['testelement'].element.metrics), 1)
+
+            self.assertEqual(
+                len(j.elements['host1'].element.metrics), 1)
+
+            self.assertEqual(
+                len(j.elements['host2'].element.metrics), 1)
+
+            self.assertEqual(
+                len(j.elements['host3'].element.metrics), 1)
+
+            self.poster5.flush_error_count = 901
+            self.poster5.flush()
+
+            self.assertEqual(mock_logging.error.call_args_list[0][0][0],
+                             "failed to post for at least 900 seconds. dropping data to prevent memory starvation.")
+
+            j = self.poster5.elements
+
+            self.assertEqual(len(j.elements), 1)
+            self.assertEqual(len(j.elements['testelement'].metrics), 0)
+
+            # self.poster5.elements.delete_all()
+
     def tearDown(self):
         self.poster.stop()
         self.poster2.stop()
         self.poster3.stop()
         self.poster4.stop()
+        self.poster5.stop()
 
 if __name__ == '__main__':
     unittest.main()
