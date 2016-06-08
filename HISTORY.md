@@ -1,6 +1,11 @@
 History
 -------
 
+Version 0.0.8 - Jun 08 2016
+---------------------------
+* protect against memory starvation
+* improve tests
+
 Version 0.0.7 - Jun 07 2016
 ---------------------------
 * fix samples not being cleared properly

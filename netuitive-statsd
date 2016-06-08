@@ -64,7 +64,7 @@ from setproctitle import setproctitle
 import libs
 
 # Constants
-__version__ = "0.0.7"
+__version__ = "0.0.8"
 __author__ = "Netuitive, Inc."
 __license__ = "Apache 2.0"
 
