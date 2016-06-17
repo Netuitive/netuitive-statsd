@@ -18,7 +18,7 @@ with open('dev-requirements.txt') as f:
 
 setup(
     name='netuitive_statsd',
-    version='0.0.8',
+    version='0.1.0',
     description="Netuitive StatsD server",
     long_description='Netuitive StatsD server\n',
     author="Netuitive",
