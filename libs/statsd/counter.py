@@ -32,18 +32,13 @@ class Counter(object):
         if rate is None:
             rate = 1.0
 
-        if sign is None:
-            self.value += float(value * float(rate))
-
         if sign == '+':
             self.signed = True
-            self.value += float(value * float(rate))
-
-        if sign == '-':
-            self.signed = True
-            self.value += float(float(-value) * float(rate))
-
-        self.samples.append(float(self.value * float(rate)))
+            self.samples.append(float(value) * float(rate))
+        elif sign == '-':
+            self.samples.append(float(-value) * float(rate))
+        else:
+            self.samples.append(float(value) * float(rate))
 
     def get_values(self, timestamp):
 

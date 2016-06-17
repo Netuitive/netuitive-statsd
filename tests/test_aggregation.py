@@ -153,16 +153,16 @@ class Test_Aggregation(unittest.TestCase):
             # the samples used to build the payload
             samples_to_post = e.element.samples[0].__dict__
 
-            self.assertListEqual(samples, [10.0, 11.0, 21.0])
+            self.assertListEqual(samples, [10.0, 1.0, 10.0])
             self.assertEqual(prepared_samples, [])
-            self.assertEqual(samples_to_post, {'avg': 14.0,
+            self.assertEqual(samples_to_post, {'avg': 21.0/3.0,
                                                'cnt': 3.0,
-                                               'max': 21.0,
+                                               'max': 10.0,
                                                'metricId': 'statsd.counter',
-                                               'min': 10.0,
-                                               'sum': 42.0,
+                                               'min': 1.0,
+                                               'sum': 21.0,
                                                'timestamp': samples_to_post['timestamp'],
-                                               'val': 42.0})
+                                               'val': 21.0})
 
     def test_counter_aggregate_test2(self):
 
@@ -183,16 +183,16 @@ class Test_Aggregation(unittest.TestCase):
             # the samples used to build the payload
             samples_to_post = e.element.samples[0].__dict__
 
-            self.assertListEqual(samples, [-10.0, -9.0, 11.0])
+            self.assertListEqual(samples, [-10.0, 1.0, 20.0])
             self.assertEqual(prepared_samples, [])
-            self.assertEqual(samples_to_post, {'avg': -2.6666666666666665,
+            self.assertEqual(samples_to_post, {'avg': 11.0/3.0,
                                                'cnt': 3.0,
-                                               'max': 11.0,
+                                               'max': 20.0,
                                                'metricId': 'statsd.counter',
                                                'min': -10.0,
-                                               'sum': -8.0,
+                                               'sum': 11.0,
                                                'timestamp': samples_to_post['timestamp'],
-                                               'val': -8.0})
+                                               'val': 11.0})
 
     def test_counter_aggregate_test3(self):
 
@@ -213,16 +213,16 @@ class Test_Aggregation(unittest.TestCase):
             # the samples used to build the payload
             samples_to_post = e.element.samples[0].__dict__
 
-            self.assertListEqual(samples, [2.0, 7.0, 10.0])
+            self.assertListEqual(samples, [2.0, 5.0, 3.0])
             self.assertEqual(prepared_samples, [])
-            self.assertEqual(samples_to_post, {'avg': 6.333333333333333,
+            self.assertEqual(samples_to_post, {'avg': 10.0/3.0,
                                                'cnt': 3.0,
-                                               'max': 10.0,
+                                               'max': 5.0,
                                                'metricId': 'statsd.counter',
                                                'min': 2.0,
-                                               'sum': 19.0,
+                                               'sum': 10.0,
                                                'timestamp': samples_to_post['timestamp'],
-                                               'val': 19.0})
+                                               'val': 10.0})
 
     def test_timer_aggregate(self):
         with self.lock:
