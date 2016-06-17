@@ -1,3 +1,9 @@
+wheel>=0.23.0
+docopt
+netuitive>=0.1.0
+configobj
+setproctitle
+docutils
 tox
 tox-pyenv
 mock
