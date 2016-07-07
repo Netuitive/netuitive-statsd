@@ -1,6 +1,10 @@
 History
 -------
 
+Version 0.1.1 - Jul 07 2016
+---------------------------
+* fix tag processing bug
+
 Version 0.1.0 - Jun 17 2016
 ---------------------------
 * Change the way SUM is calculated for counter types. SUM will now be calculated as sum the input values instead of the sum of incremental updated counter value for each time period.

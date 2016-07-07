@@ -118,27 +118,32 @@ class Element(object):
 
         unit = ''
         sparseDataStrategy = 'None'
+        metric_tags = []
 
         try:
 
             timestamp = int(ts)
             mtype = self.metric_types[metricType]
 
-            # # reserved tags
+            # process tags
             for t in tags:
-
                 # check for unit tag
                 if 'un' in t:
                     unit = t['un']
-
+                    metric_tags.append(t)
                 # check for sparse data tag
-                if 'sds' in t:
+                elif 'sds' in t:
                     sparseDataStrategy = t['sds']
+                    metric_tags.append(t)
 
-                # check for sparse data tag
-                if 'ty' in t:
+                # check for element type
+                elif 'ty' in t:
                     self.element.type = t['ty']
-                    tags.remove(t)
+
+                else:
+                    metric_tags.append(t)
+
+            del tags
 
             if metricId in self.metrics:
 
@@ -153,14 +158,14 @@ class Element(object):
             if mtype == 'GAUGE':
                 if metricId not in self.metrics:
                     self.metrics[metricId] = statsd.Gauge(
-                        metricId, sparseDataStrategy, unit, tags)
+                        metricId, sparseDataStrategy, unit, metric_tags)
 
                 self.metrics[metricId].add_value(value, timestamp, sign)
 
             if mtype == 'COUNTER':
                 if metricId not in self.metrics:
                     self.metrics[metricId] = statsd.Counter(
-                        metricId, sparseDataStrategy, unit, tags)
+                        metricId, sparseDataStrategy, unit, metric_tags)
 
                 self.metrics[metricId].add_value(
                     value, timestamp, rate, sign)
@@ -168,7 +173,7 @@ class Element(object):
             if mtype == 'HISTOGRAM' or mtype == 'TIMER':
                 if metricId not in self.metrics:
                     self.metrics[metricId] = statsd.Histogram(
-                        metricId, sparseDataStrategy, unit, tags)
+                        metricId, sparseDataStrategy, unit, metric_tags)
 
                 self.metrics[metricId].add_value(
                     value, timestamp)
@@ -176,12 +181,13 @@ class Element(object):
             if mtype == 'SET':
                 if metricId not in self.metrics:
                     self.metrics[metricId] = statsd.Set(
-                        metricId, sparseDataStrategy, unit, tags)
+                        metricId, sparseDataStrategy, unit, metric_tags)
 
                 self.metrics[metricId].add_value(value, timestamp)
 
         except Exception as e:
             logger.error(e, exc_info=True)
+            print(e)
             raise(e)
 
     def prepare(self):
