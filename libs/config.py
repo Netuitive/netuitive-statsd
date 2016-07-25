@@ -42,7 +42,8 @@ def config(args=None):
         'log_file': 'netuitive-statsd.log',
         'debug': False,
         'foreground': False,
-        'nolog': False
+        'nolog': False,
+        'no_internal_metrics': False
     }
 
     if args is None:
@@ -150,6 +151,7 @@ def config(args=None):
         ret['debug'] = args['--debug']
         ret['nolog'] = args['--nolog']
         ret['foreground'] = args['--foreground']
+        ret['no_internal_metrics'] = args['--no_internal_metrics']
 
         # if we're in debug make sure we log in debug
         if ret['debug'] is True:

@@ -41,7 +41,8 @@ class Test_Config(unittest.TestCase):
                     'prefix': 'statsd',
                     'foreground': False,
                     'nolog': False,
-                    'url': 'https://api.app.netuitive.com/ingest'}
+                    'url': 'https://api.app.netuitive.com/ingest',
+                    'no_internal_metrics': False}
 
         self.assertEqual(resp, defaults)
 
@@ -64,7 +65,8 @@ class Test_Config(unittest.TestCase):
                 u'--foreground': False,
                 u'--nolog': False,
                 u'--url': u'https://api.app.netuitive.com/ingest',
-                u'<command>': 'info'}
+                u'<command>': 'info',
+                u'--no_internal_metrics': False}
 
         try:
             resp = libs.config(args)
@@ -93,7 +95,8 @@ class Test_Config(unittest.TestCase):
                 u'--foreground': False,
                 u'--nolog': False,
                 u'--url': u'https://api.app.netuitive.com/ingest',
-                u'<command>': 'info'}
+                u'<command>': 'info',
+                u'--no_internal_metrics': False}
 
         resp = libs.config(args)
 
@@ -115,7 +118,8 @@ class Test_Config(unittest.TestCase):
                     'prefix': 'statsd',
                     'foreground': False,
                     'nolog': False,
-                    'url': 'https://api.app.netuitive.com/ingest/infrastructure'}
+                    'url': 'https://api.app.netuitive.com/ingest/infrastructure',
+                    'no_internal_metrics': False}
 
         self.assertEqual(resp, expected)
 
@@ -138,7 +142,8 @@ class Test_Config(unittest.TestCase):
                 u'--foreground': False,
                 u'--nolog': False,
                 u'--url': u'https://api.app.netuitive.com/ingest',
-                u'<command>': 'info'}
+                u'<command>': 'info',
+                u'--no_internal_metrics': False}
 
         resp = libs.config(args)
 
@@ -160,7 +165,8 @@ class Test_Config(unittest.TestCase):
                     'prefix': 'statsd',
                     'foreground': False,
                     'nolog': False,
-                    'url': 'https://api.app.netuitive.com/ingest'}
+                    'url': 'https://api.app.netuitive.com/ingest',
+                    'no_internal_metrics': False}
 
         self.assertEqual(resp, expected)
 

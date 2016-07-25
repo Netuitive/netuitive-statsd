@@ -28,6 +28,7 @@ class Poster(threading.Thread):
         self.event_count = float(0)
         self.metric_prefix = self.config['prefix']
         self.stats_prefix = self.metric_prefix + '.netuitive-statsd'
+        self.no_internal_metrics = self.config['no_internal_metrics']
 
         self.flush_time = 0
         logger.debug('Messages will be sent to ' + self.config['url'])
@@ -82,31 +83,32 @@ class Poster(threading.Thread):
 
                 timestamp = int(time.time())
 
-                # add some of our internal metric samples
-                self.elements.add(self.stats_prefix +
-                                  '.packets_received.count',
-                                  timestamp,
-                                  self.packet_count,
-                                  'c',
-                                  elementId=self.hostname)
+                if self.no_internal_metrics is False:
+                    # add some of our internal metric samples
+                    self.elements.add(self.stats_prefix +
+                                      '.packets_received.count',
+                                      timestamp,
+                                      self.packet_count,
+                                      'c',
+                                      elementId=self.hostname)
 
-                self.elements.add(self.stats_prefix +
-                                  '.samples_received.count',
-                                  timestamp,
-                                  self.sample_count,
-                                  'c',
-                                  elementId=self.hostname)
+                    self.elements.add(self.stats_prefix +
+                                      '.samples_received.count',
+                                      timestamp,
+                                      self.sample_count,
+                                      'c',
+                                      elementId=self.hostname)
 
-                self.elements.add(self.stats_prefix +
-                                  '.event_received.count',
-                                  timestamp,
-                                  self.event_count,
-                                  'c',
-                                  elementId=self.hostname)
+                    self.elements.add(self.stats_prefix +
+                                      '.event_received.count',
+                                      timestamp,
+                                      self.event_count,
+                                      'c',
+                                      elementId=self.hostname)
 
-                logger.debug('Sample count: {0}'.format(self.sample_count))
-                logger.debug('Packet count: {0}'.format(self.packet_count))
-                logger.debug('Event count: {0}'.format(self.event_count))
+                    logger.debug('Sample count: {0}'.format(self.sample_count))
+                    logger.debug('Packet count: {0}'.format(self.packet_count))
+                    logger.debug('Event count: {0}'.format(self.event_count))
 
                 logger.debug(
                     'Flushing {0} samples and '

@@ -35,7 +35,8 @@ class Test_Aggregation(unittest.TestCase):
                        'listen_port': 8125,
                        'prefix': 'statsd',
                        'foreground': False,
-                       'url': 'http://test.com'}
+                       'url': 'http://test.com',
+                       'no_internal_metrics': False}
 
         self.timestamp = 1434110794
         self.myElement = libs.Element(self.config['hostname'])
@@ -155,7 +156,7 @@ class Test_Aggregation(unittest.TestCase):
 
             self.assertListEqual(samples, [10.0, 1.0, 10.0])
             self.assertEqual(prepared_samples, [])
-            self.assertEqual(samples_to_post, {'avg': 21.0/3.0,
+            self.assertEqual(samples_to_post, {'avg': 21.0 / 3.0,
                                                'cnt': 3.0,
                                                'max': 10.0,
                                                'metricId': 'statsd.counter',
@@ -185,7 +186,7 @@ class Test_Aggregation(unittest.TestCase):
 
             self.assertListEqual(samples, [-10.0, 1.0, 20.0])
             self.assertEqual(prepared_samples, [])
-            self.assertEqual(samples_to_post, {'avg': 11.0/3.0,
+            self.assertEqual(samples_to_post, {'avg': 11.0 / 3.0,
                                                'cnt': 3.0,
                                                'max': 20.0,
                                                'metricId': 'statsd.counter',
@@ -215,7 +216,7 @@ class Test_Aggregation(unittest.TestCase):
 
             self.assertListEqual(samples, [2.0, 5.0, 3.0])
             self.assertEqual(prepared_samples, [])
-            self.assertEqual(samples_to_post, {'avg': 10.0/3.0,
+            self.assertEqual(samples_to_post, {'avg': 10.0 / 3.0,
                                                'cnt': 3.0,
                                                'max': 5.0,
                                                'metricId': 'statsd.counter',
