@@ -1,6 +1,12 @@
 History
 -------
 
+Version 0.2.0 - Jul 25 2016
+---------------------------
+* improve test performance
+* add option to disable internal metrics
+* update netuitive-python-client
+
 Version 0.1.1 - Jul 07 2016
 ---------------------------
 * fix tag processing bug

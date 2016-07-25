@@ -3,12 +3,6 @@
 
 from setuptools import setup
 
-try:
-    import libs
-except:
-    pass
-
-
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
@@ -18,7 +12,7 @@ with open('dev-requirements.txt') as f:
 
 setup(
     name='netuitive_statsd',
-    version='0.1.1',
+    version='0.2.0',
     description="Netuitive StatsD server",
     long_description='Netuitive StatsD server\n',
     author="Netuitive",
@@ -41,6 +35,6 @@ setup(
     ],
     test_suite='tests',
     tests_require=test_requirements,
-    packages=['libs', 'libs.statsd'],
+    packages=['libs', 'libs.statsd', ''],
     scripts=['netuitive-statsd']
 )
