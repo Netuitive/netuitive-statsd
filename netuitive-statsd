@@ -7,7 +7,7 @@
             [--prefix=<PREFIX>] [--hostname=<HOSTNAME>] [--pid_file=<PID>]
             [--log_file=<LOG>] [--listen_ip=<LIP>] [--listen_port=<LPRT>]
             [--forward_ip=<FIP>] [--forward_port=<FPRT>] [--forward]
-            [--log_level=<LEVEL>] [--nolog] [-no_internal_metrics]
+            [--log_level=<LEVEL>] [--nolog] [--no_internal_metrics]
             <command>
 
          <command>
@@ -64,7 +64,7 @@ from setproctitle import setproctitle
 import libs
 
 # Constants
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 __author__ = "Netuitive, Inc."
 __license__ = "Apache 2.0"
 

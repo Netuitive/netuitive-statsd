@@ -1,6 +1,10 @@
 History
 -------
 
+Version 0.2.1 - Jul 26 2016
+---------------------------
+* fix option to disable internal metrics
+
 Version 0.2.0 - Jul 25 2016
 ---------------------------
 * improve test performance
