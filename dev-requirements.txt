@@ -1,6 +1,6 @@
 wheel>=0.23.0
 docopt
-netuitive>=0.2.0
+netuitive>=0.2.1
 configobj
 setproctitle
 docutils

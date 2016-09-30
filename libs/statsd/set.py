@@ -1,5 +1,6 @@
 import logging
-import time
+
+from .util import get_timestamp
 
 logger = logging.getLogger(__name__)
 
@@ -12,13 +13,13 @@ class Set(object):
         self.unit = unit
         self.tags = tags
         self.values = []
-        self.timestamp = int(time.time())
+        self.timestamp = get_timestamp()
         self.metricType = 'GAUGE'
         self.orgtype = ['SET']
 
     def add_value(self, value, ts, sign=None):
 
-        timestamp = int(ts)
+        timestamp = get_timestamp()
         if value not in self.values:
             self.values.append(value)
 

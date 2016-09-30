@@ -1,6 +1,10 @@
 History
 -------
 
+Version 0.2.2 - Sep 30 2016
+---------------------------
+* update netuitive-python-client
+
 Version 0.2.1 - Jul 26 2016
 ---------------------------
 * fix option to disable internal metrics

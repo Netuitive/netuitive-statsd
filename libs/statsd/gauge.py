@@ -1,5 +1,6 @@
 import logging
-import time
+
+from .util import get_timestamp
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +16,7 @@ class Gauge(object):
         self.tags = tags
         self.value = float(0)
         self.signed = False
-        self.timestamp = int(time.time())
+        self.timestamp = get_timestamp()
         self.samples = []
         self.min = None
         self.max = None
@@ -24,7 +25,7 @@ class Gauge(object):
         self.cnt = float(0)
 
     def add_value(self, value, ts, sign=None):
-        self.timestamp = int(ts)
+        self.timestamp = get_timestamp()
 
         if sign is None:
             self.value = float(value)
