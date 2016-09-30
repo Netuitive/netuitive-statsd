@@ -1,5 +1,6 @@
 import logging
-import time
+
+from .util import get_timestamp
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +14,7 @@ class Histogram(object):
         self.tags = tags
         self.metricType = 'GAUGE'
         self.orgtype = ['TIMER', 'HISTOGRAM']
-        self.timestamp = int(time.time())
+        self.timestamp = get_timestamp()
         self.rate = 1
         self.percentile = 0
         self.samples = []
@@ -25,7 +26,7 @@ class Histogram(object):
         self.cnt = float(0)
 
     def add_value(self, value, ts):
-        timestamp = int(ts)
+        timestamp = get_timestamp()
 
         self.value += value
         self.samples.append(value)

@@ -250,7 +250,8 @@ class Element(object):
                         mmax,
                         mavg,
                         msum,
-                        mcnt)
+                        mcnt,
+                        ts_is_ms=True)
 
                     # since our results are ready for posting
                     metric.clear()

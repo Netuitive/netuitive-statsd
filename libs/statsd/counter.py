@@ -1,6 +1,6 @@
 import logging
-import time
 
+from .util import get_timestamp
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ class Counter(object):
         self.tags = tags
         self.value = float(0)
         self.signed = False
-        self.timestamp = int(time.time())
+        self.timestamp = get_timestamp()
         self.samples = []
         self.min = None
         self.max = None
@@ -27,7 +27,7 @@ class Counter(object):
         self.cnt = float(0)
 
     def add_value(self, value, ts, rate=None, sign=None):
-        self.timestamp = int(ts)
+        self.timestamp = get_timestamp()
 
         if rate is None:
             rate = 1.0
