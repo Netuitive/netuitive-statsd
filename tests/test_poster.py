@@ -86,7 +86,7 @@ class Test_Poster(unittest.TestCase):
                         'url': 'http://test.com',
                         'no_internal_metrics': True}
 
-        self.timestamp = 1434110794
+        self.timestamp = 1434110794002
         self.lock = threading.Lock()
 
     def test_Poster_config(self):
@@ -604,17 +604,17 @@ class Test_Poster(unittest.TestCase):
                            'metricId': 'statsd.timer',
                            'min': 320.0,
                            'sum': 320.0,
-                           'timestamp': element.samples[0].timestamp,
+                           'timestamp': samples_list[0]['timestamp'],
                            'val': 320.0},
-                          {'metricId': 'statsd.set', 'timestamp': element.samples[
-                              0].timestamp, 'val': 1.0},
+                          {'metricId': 'statsd.set', 'timestamp': samples_list[
+                              1]['timestamp'], 'val': 1.0},
                              {'avg': 333.0,
                               'cnt': 1.0,
                               'max': 333.0,
                               'metricId': 'statsd.histogram',
                               'min': 333.0,
                               'sum': 333.0,
-                              'timestamp': element.samples[0].timestamp,
+                              'timestamp': samples_list[2]['timestamp'],
                               'val': 333.0},
                              {'avg': 333.0,
                               'cnt': 1.0,
@@ -622,7 +622,7 @@ class Test_Poster(unittest.TestCase):
                               'metricId': 'statsd.gauge',
                               'min': 333.0,
                               'sum': 333.0,
-                              'timestamp': element.samples[0].timestamp,
+                              'timestamp': samples_list[3]['timestamp'],
                               'val': 333.0},
                              {'avg': 0.1,
                               'cnt': 1.0,
@@ -630,7 +630,7 @@ class Test_Poster(unittest.TestCase):
                               'metricId': 'statsd.counterrate',
                               'min': 0.1,
                               'sum': 0.1,
-                              'timestamp': element.samples[0].timestamp,
+                              'timestamp': samples_list[4]['timestamp'],
                               'val': 0.1},
                              {'avg': 333.0,
                               'cnt': 1.0,
@@ -638,7 +638,7 @@ class Test_Poster(unittest.TestCase):
                               'metricId': 'statsd.counter.tag',
                               'min': 333.0,
                               'sum': 333.0,
-                              'timestamp': element.samples[0].timestamp,
+                              'timestamp': samples_list[5]['timestamp'],
                               'val': 333.0},
                              {'avg': 1.0,
                               'cnt': 1.0,
@@ -646,7 +646,7 @@ class Test_Poster(unittest.TestCase):
                               'metricId': 'statsd.counter',
                               'min': 1.0,
                               'sum': 1.0,
-                              'timestamp': element.samples[0].timestamp,
+                              'timestamp': samples_list[6]['timestamp'],
                               'val': 1.0}]
                          )
 

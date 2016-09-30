@@ -1,4 +1,4 @@
-import time
+
 import logging
 import netuitive
 
@@ -201,7 +201,7 @@ class Element(object):
             for m in self.metrics:
 
                 metric = self.metrics[m]
-                samples = metric.get_values(int(time.time()))
+                samples = metric.get_values(statsd.util.get_timestamp())
                 metricType = metric.metricType
                 sparseDataStrategy = metric.sparseDataStrategy
                 unit = metric.unit
