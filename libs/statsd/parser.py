@@ -255,6 +255,7 @@ def parse_message(message):
             logger.error(
                 'Invalid Message Format: "' + str(msg).rstrip() + '"')
             logger.error(str(e))
+            return(None)
 
     if sample_count == 0 and event_count == 0:
         # if we are here, we found bupkis
