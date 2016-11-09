@@ -1,6 +1,10 @@
 History
 -------
 
+Version 0.2.3 - Nov 09 2016
+---------------------------
+* fix "list index out of range" issue
+
 Version 0.2.2 - Sep 30 2016
 ---------------------------
 * update netuitive-python-client
