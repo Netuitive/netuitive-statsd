@@ -28,6 +28,8 @@ class Test_Message_Parser(unittest.TestCase):
         resp4 = libs.statsd.parse_message('format.fail| c')
         resp5 = libs.statsd.parse_message('format.fail|#tag:1')
         resp6 = libs.statsd.parse_message('format.fail||c')
+        resp7 = libs.statsd.parse_message(
+            'ev-api.gauge.response.swagger-resources.configuration.ui:')
 
         self.assertEqual(resp1, None)
         self.assertEqual(resp2, None)
@@ -35,6 +37,7 @@ class Test_Message_Parser(unittest.TestCase):
         self.assertEqual(resp4, None)
         self.assertEqual(resp5, None)
         self.assertEqual(resp6, None)
+        self.assertEqual(resp7, None)
 
     def test_sanitize_metric(self):
         resp1 = libs.statsd.parse_message('counter test:1|c')
