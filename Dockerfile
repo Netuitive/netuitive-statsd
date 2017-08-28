@@ -20,7 +20,7 @@ RUN chmod +x /entrypoint.sh
 RUN mkdir -p /opt/netuitive-statsd
 COPY . /opt/netuitive-statsd
 
-WORKDIR /opt/netuitive/netuitive-statsd
+WORKDIR /opt/netuitive-statsd
 
 EXPOSE 8125/udp
 
