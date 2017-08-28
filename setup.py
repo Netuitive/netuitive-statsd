@@ -12,7 +12,7 @@ with open('dev-requirements.txt') as f:
 
 setup(
     name='netuitive_statsd',
-    version='0.2.3',
+    version='0.3.0',
     description="Netuitive StatsD server",
     long_description='Netuitive StatsD server\n',
     author="Netuitive",
