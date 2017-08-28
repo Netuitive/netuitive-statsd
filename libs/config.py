@@ -111,11 +111,6 @@ def config(args=None):
 
             ret['log_file'] = log_file
 
-            if 'collectors' in cfg:
-                if 'hostname' in cfg['collectors']['default']:
-                    ret['hostname'] = cfg[
-                        'collectors']['default']['hostname']
-
             ret['log_level'] = cfg['logger_root']['level']
 
         else:
