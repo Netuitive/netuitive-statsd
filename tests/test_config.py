@@ -32,7 +32,6 @@ class Test_Config(unittest.TestCase):
                     'forward': False,
                     'forward_ip': None,
                     'forward_port': None,
-                    'hostname': socket.getfqdn().split('.')[0],
                     'interval': 60,
                     'listen_ip': '127.0.0.1',
                     'listen_port': 8125,

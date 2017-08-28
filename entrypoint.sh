@@ -12,7 +12,7 @@ if [ -n "${DEBUG}" ]; then
 fi
 
 
-python /opt/netuitive-statsd/netuitive-statsd.py \
+python /opt/netuitive-statsd/netuitive-statsd \
 --nolog \
 --api_key=${APIKEY} \
 --url=${APIURL} \
