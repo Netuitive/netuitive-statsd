@@ -152,6 +152,7 @@ def config(args=None):
         logger.error(e, exc_info=True)
         raise(e)
 
+
 def get_hostname(fullconfig, method=None):
     """
     Returns a hostname as configured by the user
