@@ -1,6 +1,15 @@
 History
 -------
 
+Version 0.3.1 - Aug 28 2017
+---------------------------
+* Fix customizable hostname support constructor bug
+
+Version 0.3.0 - Aug 28 2017
+---------------------------
+* Add a deploy step to the Travis CI build
+* Add customizable hostname support
+
 Version 0.2.3 - Nov 09 2016
 ---------------------------
 * fix "list index out of range" issue
