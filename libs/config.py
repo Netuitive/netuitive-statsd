@@ -158,6 +158,17 @@ def get_hostname(fullconfig, method=None):
     # case insensitive method
     method = method.lower()
 
+    if 'hostname' not in config:
+        hostname = socket.getfqdn().split('.')[0]
+        if hostname == 'localhost':
+            return socket.gethostname().split('.')[0]
+        if hostname == 'localhost':
+            return os.uname()[1].split('.')[0]
+        if hostname == 'localhost':
+            logger.error('could not determine hostname')
+            return None
+        return hostname
+
     if 'hostname' in config and method != 'shell':
         return config['hostname']
 
