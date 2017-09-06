@@ -1,6 +1,8 @@
 History
 -------
 
+* Fix the default behavior if given no hostname
+
 Version 0.3.1 - Aug 28 2017
 ---------------------------
 * Fix customizable hostname support constructor bug
