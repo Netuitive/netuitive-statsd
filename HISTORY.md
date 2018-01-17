@@ -1,6 +1,10 @@
 History
 -------
 
+Version 0.3.3 - Jan 17 2018
+---------------------------
+* Fix forever cached elements in poster
+
 Version 0.3.2 - Sep 06 2017
 ---------------------------
 * Fix the default behavior if given no hostname
