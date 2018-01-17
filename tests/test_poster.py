@@ -1192,24 +1192,15 @@ class Test_Poster(unittest.TestCase):
         self.assertEqual(
             len(j.elements['testelement'].element.samples), 0)
 
-        self.assertEqual(len(j.elements['host1'].element.samples), 0)
-
-        self.assertEqual(len(j.elements['host2'].element.samples), 0)
-
-        self.assertEqual(len(j.elements['host3'].element.samples), 0)
-
-        # everything should have 0 metric
         self.assertEqual(
             len(j.elements['testelement'].element.metrics), 0)
 
-        self.assertEqual(
-            len(j.elements['host1'].element.metrics), 0)
+        # there will no longer be cached elements created from 'h' tags
+        self.assertNotIn('host1', j.elements.keys())
 
-        self.assertEqual(
-            len(j.elements['host2'].element.metrics), 0)
+        self.assertNotIn('host2', j.elements.keys())
 
-        self.assertEqual(
-            len(j.elements['host3'].element.metrics), 0)
+        self.assertNotIn('host3', j.elements.keys())
 
         poster.stop()
         poster.join()

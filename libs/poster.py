@@ -180,6 +180,7 @@ class Poster(threading.Thread):
                 self.packet_count = 0
                 self.event_count = 0
                 self.events = []
+                self.elements.delete_all()
                 return(True)
 
         except Exception as e:
