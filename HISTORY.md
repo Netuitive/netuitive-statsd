@@ -1,5 +1,8 @@
 History
 -------
+Version 0.3.4 - Feb 16 2018
+---------------------------
+* Pull the latest Netuitive python client that contains a bug fix and improvement for handling element metrics lookup during adding a sample 
 
 Version 0.3.3 - Jan 17 2018
 ---------------------------
