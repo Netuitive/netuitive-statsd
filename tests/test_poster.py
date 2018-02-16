@@ -121,6 +121,7 @@ class Test_Poster(unittest.TestCase):
         for ename in poster.elements.elements:
             e = poster.elements.elements[ename]
             e.prepare()
+            e.element.merge_metrics()
 
         j = json.loads(json.dumps(
             poster.elements.elements, default=lambda o: o.__dict__,
@@ -186,6 +187,7 @@ class Test_Poster(unittest.TestCase):
         for ename in poster.elements.elements:
             e = poster.elements.elements[ename]
             e.prepare()
+            e.element.merge_metrics()
 
         j = json.loads(json.dumps(
             poster.elements.elements, default=lambda o: o.__dict__,
@@ -260,6 +262,7 @@ class Test_Poster(unittest.TestCase):
         for ename in poster.elements.elements:
             e = poster.elements.elements[ename]
             e.prepare()
+            e.element.merge_metrics()
 
         j = json.loads(json.dumps(
             poster.elements.elements, default=lambda o: o.__dict__,
@@ -325,6 +328,7 @@ class Test_Poster(unittest.TestCase):
         for ename in poster.elements.elements:
             e = poster.elements.elements[ename]
             e.prepare()
+            e.element.merge_metrics()
 
         j = json.loads(json.dumps(
             poster.elements.elements, default=lambda o: o.__dict__,
@@ -392,6 +396,7 @@ class Test_Poster(unittest.TestCase):
         for ename in poster.elements.elements:
             e = poster.elements.elements[ename]
             e.prepare()
+            e.element.merge_metrics()
 
         j = json.loads(json.dumps(
             poster.elements.elements, default=lambda o: o.__dict__,
@@ -457,6 +462,7 @@ class Test_Poster(unittest.TestCase):
         for ename in poster.elements.elements:
             e = poster.elements.elements[ename]
             e.prepare()
+            e.element.merge_metrics()
 
         j = json.loads(json.dumps(
             poster.elements.elements, default=lambda o: o.__dict__,
@@ -524,6 +530,7 @@ class Test_Poster(unittest.TestCase):
         for ename in poster.elements.elements:
             e = poster.elements.elements[ename]
             e.prepare()
+            e.element.merge_metrics()
 
         j = json.loads(json.dumps(
             poster.elements.elements, default=lambda o: o.__dict__,
@@ -577,6 +584,7 @@ class Test_Poster(unittest.TestCase):
         for ename in poster.elements.elements:
             e = poster.elements.elements[ename]
             e.prepare()
+            e.element.merge_metrics()
 
             element = e.element
 
@@ -812,6 +820,7 @@ class Test_Poster(unittest.TestCase):
         for ename in poster.elements.elements:
             e = poster.elements.elements[ename]
             e.prepare()
+            e.element.merge_metrics()
 
         j = json.loads(json.dumps(
             poster.elements.elements, default=lambda o: o.__dict__,
@@ -878,6 +887,7 @@ class Test_Poster(unittest.TestCase):
         for ename in poster.elements.elements:
             e = poster.elements.elements[ename]
             e.prepare()
+            e.element.merge_metrics()
 
         j = json.loads(json.dumps(
             poster.elements.elements, default=lambda o: o.__dict__,
@@ -943,6 +953,7 @@ class Test_Poster(unittest.TestCase):
         for ename in poster.elements.elements:
             e = poster.elements.elements[ename]
             e.prepare()
+            e.element.merge_metrics()
 
         j = json.loads(json.dumps(
             poster.elements.elements, default=lambda o: o.__dict__,
@@ -1008,6 +1019,7 @@ class Test_Poster(unittest.TestCase):
         for ename in poster.elements.elements:
             e = poster.elements.elements[ename]
             e.prepare()
+            e.element.merge_metrics()
 
         j = json.loads(json.dumps(
             poster.elements.elements, default=lambda o: o.__dict__,
@@ -1077,6 +1089,7 @@ class Test_Poster(unittest.TestCase):
         for ename in poster.elements.elements:
             e = poster.elements.elements[ename]
             e.prepare()
+            e.element.merge_metrics()
 
         j = json.loads(json.dumps(
             poster.elements.elements, default=lambda o: o.__dict__,
@@ -1156,6 +1169,7 @@ class Test_Poster(unittest.TestCase):
         for ename in poster.elements.elements:
             e = poster.elements.elements[ename]
             e.prepare()
+            e.element.merge_metrics()
 
         j = poster.elements
 
@@ -1226,6 +1240,7 @@ class Test_Poster(unittest.TestCase):
         for ename in poster.elements.elements:
             e = poster.elements.elements[ename]
             e.prepare()
+            e.element.merge_metrics()
 
         j = poster.elements
 
