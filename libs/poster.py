@@ -262,24 +262,11 @@ class Poster(threading.Thread):
                                                 'netuitive-statsd'))
 
                 # process a metric/sample message
-                if len(messages['metrics']) > 0 and self.metric_prefix != "":
+                if len(messages['metrics']) > 0:
                     for m in messages['metrics']:
                         with self.lock:
                             self.elements.add(
-                                self.metric_prefix + '.' + m['name'],
-                                timestamp,
-                                m['value'],
-                                m['type'],
-                                m['sign'],
-                                m['rate'],
-                                m['tags'],
-                                m['hostname']
-                            )
-                elif len(messages['metrics']) > 0 and self.metric_prefix == "":
-                    for m in messages['metrics']:
-                        with self.lock:
-                            self.elements.add(
-                                self.metric_prefix + m['name'],
+                                self.metric_prefix + '.' + m['name'] if self.metric_prefix != "" else m['name'],
                                 timestamp,
                                 m['value'],
                                 m['type'],
