@@ -1,6 +1,6 @@
 History
 -------
-Version next
+Version 0.3.5 - Apr 25 2018
 ---------------------------
 * Fix poster to add a prefix only when the value is a non-empty string
 
