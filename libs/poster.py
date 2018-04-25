@@ -266,7 +266,9 @@ class Poster(threading.Thread):
                     for m in messages['metrics']:
                         with self.lock:
                             self.elements.add(
-                                self.metric_prefix + '.' + m['name'] if self.metric_prefix != "" else m['name'],
+                                self.metric_prefix + '.' + m['name']
+                                if self.metric_prefix != ""
+                                else m['name'],
                                 timestamp,
                                 m['value'],
                                 m['type'],
