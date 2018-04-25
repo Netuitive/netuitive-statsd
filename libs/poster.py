@@ -27,7 +27,7 @@ class Poster(threading.Thread):
         self.packet_count = float(0)
         self.event_count = float(0)
         self.metric_prefix = self.config['prefix']
-        self.stats_prefix = self.metric_prefix + '.netuitive-statsd'
+        self.stats_prefix = 'statsd.netuitive-statsd'
         self.no_internal_metrics = self.config['no_internal_metrics']
 
         self.flush_time = 0
@@ -266,7 +266,9 @@ class Poster(threading.Thread):
                     for m in messages['metrics']:
                         with self.lock:
                             self.elements.add(
-                                self.metric_prefix + '.' + m['name'],
+                                self.metric_prefix + '.' + m['name']
+                                if self.metric_prefix != ""
+                                else m['name'],
                                 timestamp,
                                 m['value'],
                                 m['type'],
