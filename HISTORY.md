@@ -1,5 +1,9 @@
 History
 -------
+Version NEXT
+---------------------------
+* Support ver StatsD tag for tagging app.version on elements
+
 Version 0.3.5 - Apr 25 2018
 ---------------------------
 * Fix poster to add a prefix only when the value is a non-empty string

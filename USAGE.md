@@ -86,6 +86,7 @@ Reserved Metric Tags
 | ty | element type (SERVER)  |
 | un | sets the unit of the metric (bits, bytes, etc) |
 | sds | sets the sparse data strategy (ReplaceWithZero, etc) |
+| ver | sets the `app.version` tag on the parent element |
 
 
 Copyright and License
