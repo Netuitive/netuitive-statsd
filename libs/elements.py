@@ -141,12 +141,12 @@ class Element(object):
                     self.element.type = t['ty']
 
                 # check for application version
-                elif 'ver' in t:
+                elif 'v' in t:
                     # Overwrite an existing version tag
                     if any(tag.name == 'app.version' for tag in self.element.tags):
                         index = next(i for i, tag in enumerate(self.element.tags) if tag.name == 'app.version')
                         del self.element.tags[index]
-                    self.element.add_tag('app.version', t['ver'])
+                    self.element.add_tag('app.version', t['v'])
 
                 else:
                     metric_tags.append(t)

@@ -2,7 +2,7 @@ History
 -------
 Version NEXT
 ---------------------------
-* Support ver StatsD tag for tagging app.version on elements
+* Support v StatsD tag for tagging app.version on elements
 
 Version 0.3.5 - Apr 25 2018
 ---------------------------
