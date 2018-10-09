@@ -26,4 +26,4 @@ python /opt/netuitive-statsd/netuitive-statsd \
 --forward_port=${FPRT} \
 ${fwd} \
 ${debug} \
-start
+start -f
