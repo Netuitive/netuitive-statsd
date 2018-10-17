@@ -12,7 +12,7 @@ For more information on the Netuitive StatsD Server, see our [help docs](https:/
 Requirements
 ------------
 
-- Python >= 2.7 or >= 3.3
+- Python >= 2.7 or >= 3.4
 - See [requirements.txt](requirements.txt) for Python modules
 - Netuitive Linux Agent installed on your machine and setup in Netuitive
 
