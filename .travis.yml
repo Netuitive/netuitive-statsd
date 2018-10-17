@@ -7,7 +7,7 @@ python:
 - '3.6'
 cache:
   directories:
-  - $HOME/.cache/pip
+  - "$HOME/.cache/pip"
 install:
 - pip install -r dev-requirements.txt
 script:
@@ -23,7 +23,7 @@ deploy:
   provider: pypi
   user: netuitive
   password:
-    secure: ER3hJKJcRdzaOBYMqCFEK6NNtiLkwH7kEw5s40VhKaR3kmSLJ+CDVV96jD+HCDQxqjSqva07YnkUTqeF5WGnQrKQLInNhn+PGRLa9WXQBINvrQ6lPHghzzeXzXe/RylkhM3bvzel6bkCjTF+qsLLVRwqDkgJROr6LRP97g2vK3AFJFXD2Ok+RRPpbRkAK0HH0cGZwB7atOqujNCL2/8yLLxC9OJZjX8Rrn4Buw3MK0in0MmV4j5nf1IvnqhrLsWGZ1F/oeOwuN+s6xVbl3c3nyQqi3OvsQqeXZYh0OwNpfKwBfKtcwFM1GMfq/QXYci8VVe1SAxzKCO7zEN80HDcUtQ7qTTrJF9yJtTza2KLG68H1SjMEhoq96nzVATTzK+LufZvpqa2mA5wkXsl63hY+RhGcUc+A+SX6vSKrvK6SWyGwk5OSsJLiG2cgz3jvbly7Ll4cfiojHgrXYNyo5O1htNmibtORdX52oczM3Ag0/eirv8yunmYVnrvlwDYcc/ekE6XdhSv2df6ovgTznXCPi31sbaVHVGRh8q9QY98CjgwzrW8JSfqoc0sCYW6HHWoeP2lJWpX8C7grlx7x3au28wsxAuFITbeveicc8NXfxFXz4jqdX1IEB8wleFtPKmG0L2Lm3zPYOWT96JvOicrxTr2+q/LAa649Cg0X4HeGRI=
+    secure: KW2fT730G/mZ0dxDJ0K7deM4A67aQFo5ma833/GV2h6mddrgIY8MwyF4v3L9F71FqiUC6j+XvcU7GcQ4ClKlY3pgUWr+qi2DWa3kCJsOdBrEgclP7lTnuePj+gGeoq4JGPJq6Mm2OXQwAXVPrHosuW3Q7GNLilumpEFgRGRKr7CgCEuMBJXIUDcAXEFbmil5oIgQo+3YqlDIzmoastvkQzQtsqFeae/0LyMmyIkrFdqCaLKoAxwMsQ8esb95fzNIoz+C3dQ3fEPFijzWXZ34VYuCKSsa3P2dLdj8+kJVl8iIeEX92xU20jKLtNqbF9ZLj+PYMKE0pIINdwccRv0w2xoDPHQ7DSi4CiKGD19ctafJdhtCd3pB0xfMTiZzILr+trRqj9rpam286yvVf4cKUXHceAK8xI+STuGn621OddxIQUlO3p1kGpXsBIH4mfedYvCrADiZT50Gbr5bPnmIFYkdZ1MIjBvdIm3C3UNkQox/tnKQO4Fbr+n5AnXcq7lisUKUkFkznrZzm8cyfbHjpQ5KM3wys8RBjiSkXHP7pYnkuoB+MmQVC/Quq9bfS8j4swKnB+1zRNM3skaGidkaCKqftU6Sq2Ys+hxSy7NTPLFU1pLBKk/WoX/l//OfPteS3b++p/4+qTW+2qVAs2S3ur8g1A+Mc1KmQWdZIHINjio=
   on:
     tags: true
     distributions: sdist bdist_wheel
