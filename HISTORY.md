@@ -2,6 +2,7 @@ History
 -------
 Version NEXT
 ---------------------------
+* Fix linting errors
 
 Version 0.4.0 - Oct 9 2018
 ---------------------------
