@@ -3,6 +3,7 @@ History
 Version NEXT
 ---------------------------
 * Fix linting errors
+* Dropping support for Python 3.3 and adding Python 3.6
 
 Version 0.4.0 - Oct 9 2018
 ---------------------------
