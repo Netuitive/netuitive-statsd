@@ -29,4 +29,4 @@ See [HISTORY.md](HISTORY.md)
 Copyright and License
 ---------------------
 
-Copyright 2018 Netuitive, Inc. under [the Apache 2.0 license](LICENSE).
+Copyright 2018 Metricly, Inc. under [the Apache 2.0 license](LICENSE).
