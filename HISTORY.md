@@ -1,5 +1,9 @@
 History
 -------
+Version 0.4.2 - Apr 25 2019
+---------------------------
+* Set minimal required version to netuitive>=0.3.4
+
 Version 0.4.1 - Oct 17 2018
 ---------------------------
 * Fix linting errors
