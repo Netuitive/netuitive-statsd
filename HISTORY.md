@@ -1,6 +1,6 @@
 History
 -------
-Version 0.4.2 - Apr 25 2019
+Version next - MMM DD YYYY
 ---------------------------
 * Set minimal required version to netuitive>=0.3.4
 
