@@ -1,4 +1,4 @@
-wheel==0.23.0
+wheel==0.33.6
 docopt
 netuitive>=0.3.4
 configobj
