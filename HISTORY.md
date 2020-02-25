@@ -1,7 +1,11 @@
 History
 -------
-Version next - MMM DD YYYY
+Version next - Month DD YYYY
 ---------------------------
+
+Version 0.4.3 - Feb 18 2020
+---------------------------
+* Confine wheel to version >=0.23.0,<0.34.0
 
 Version 0.4.2 - April 29 2019
 ---------------------------
